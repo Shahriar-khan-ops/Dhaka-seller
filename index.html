@@ -4,51 +4,12 @@
 <meta charset="UTF-8">
 <title>DHAKA SELLER</title>
 <style>
-body{
-font-family:Arial;
-background:#f5f5f5;
-margin:0;
-}
-
-header{
-background:#fff;
-padding:20px;
-text-align:center;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
-}
-
-.container{
-padding:20px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-gap:15px;
-}
-
-.card{
-background:white;
-padding:15px;
-border-radius:10px;
-text-align:center;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
-button{
-padding:10px;
-border:none;
-background:#007bff;
-color:white;
-border-radius:5px;
-cursor:pointer;
-}
-
-#orderBox, #paymentBox, #adminBox{
-display:none;
-background:white;
-margin:20px;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 10px rgba(0,0,0,0.2);
-}
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header{background:#fff;padding:20px;text-align:center}
+.container{padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px}
+.card{background:white;padding:15px;border-radius:10px;text-align:center}
+button{padding:8px 15px;background:#007bff;color:white;border:none;border-radius:5px}
+.box{display:none;background:white;margin:20px;padding:20px;border-radius:10px}
 </style>
 </head>
 
@@ -56,57 +17,96 @@ box-shadow:0 2px 10px rgba(0,0,0,0.2);
 
 <header>
 <h1>DHAKA SELLER</h1>
-<p>Fast Game Top-Up Shop</p>
 </header>
 
 <div class="container">
-
-<div class="card">
-<h3>Free Fire</h3>
-<button onclick="buy('Free Fire')">Buy</button>
-</div>
-
-<div class="card">
-<h3>eFootball</h3>
-<button onclick="buy('eFootball')">Buy</button>
-</div>
-
-<div class="card">
-<h3>Roblox</h3>
-<button onclick="buy('Roblox')">Buy</button>
-</div>
-
-<div class="card">
-<h3>Minecraft</h3>
-<button onclick="buy('Minecraft')">Buy</button>
-</div>
-
-<div class="card">
-<h3>FC Mobile</h3>
-<button onclick="buy('FC Mobile')">Buy</button>
-</div>
-
+<div class="card"><h3>Free Fire</h3><button onclick="buy('Free Fire')">Buy</button></div>
+<div class="card"><h3>eFootball</h3><button onclick="buy('eFootball')">Buy</button></div>
+<div class="card"><h3>Roblox</h3><button onclick="buy('Roblox')">Buy</button></div>
+<div class="card"><h3>Minecraft</h3><button onclick="buy('Minecraft')">Buy</button></div>
+<div class="card"><h3>FC Mobile</h3><button onclick="buy('FC Mobile')">Buy</button></div>
 </div>
 
 <!-- ORDER -->
-<div id="orderBox">
-<h2>Place Order</h2>
-<p id="gameName"></p>
-<input id="uid" placeholder="Enter Game UID"><br><br>
-<button onclick="goPayment()">Next</button>
+<div class="box" id="orderBox">
+<h2>Order</h2>
+<p id="game"></p>
+<input id="uid" placeholder="Enter UID"><br><br>
+<button onclick="next()">Next</button>
 </div>
 
 <!-- PAYMENT -->
-<div id="paymentBox">
+<div class="box" id="payBox">
 <h2>Payment</h2>
-<p>Send money to:</p>
-<p><b>bKash / Nagad: 01XXXXXXXXX</b></p>
-<p id="finalGame"></p>
-<button onclick="confirmOrder()">I Paid</button>
+<p>bKash/Nagad: 01XXXXXXXXX</p>
+<button onclick="placeOrder()">Confirm Order</button>
 </div>
 
-<!-- ADMIN -->
-<div id="adminBox">
+<!-- ADMIN LOGIN -->
+<div class="box" id="adminLogin">
+<h2>Admin Login</h2>
+<input id="pass" type="password" placeholder="Enter Password"><br><br>
+<button onclick="login()">Login</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="box" id="adminPanel">
+<h2>Admin Panel</h2>
+<div id="orders"></div>
+</div>
+
+<script>
+
+let selected="";
+
+function buy(game){
+selected=game;
+document.getElementById("orderBox").style.display="block";
+document.getElementById("game").innerText=game;
+}
+
+function next(){
+document.getElementById("orderBox").style.display="none";
+document.getElementById("payBox").style.display="block";
+}
+
+function placeOrder(){
+let uid=document.getElementById("uid").value;
+if(uid==""){alert("Enter UID");return;}
+
+let old=localStorage.getItem("orders") || "";
+old += selected+" | "+uid+"\n";
+localStorage.setItem("orders",old);
+
+alert("Order Placed!");
+document.getElementById("payBox").style.display="none";
+}
+
+function login(){
+let pass=document.getElementById("pass").value;
+if(pass=="1234"){
+document.getElementById("adminLogin").style.display="none";
+document.getElementById("adminPanel").style.display="block";
+
+document.getElementById("orders").innerText =
+localStorage.getItem("orders") || "No Orders";
+}
+else{
+alert("Wrong Password");
+}
+}
+
+// secret admin open
+document.addEventListener("keydown",function(e){
+if(e.key==="a"){
+document.getElementById("adminLogin").style.display="block";
+}
+});
+
+</script>
+
+</body>
+</html><div id="adminBox">
 <h2>Admin Panel</h2>
 <p>New Orders will show here (demo only)</p>
 <div id="orders"></div>
