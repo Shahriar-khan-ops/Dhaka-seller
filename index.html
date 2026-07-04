@@ -2,104 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DHAKA SELLER</title>
 <style>
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-        font-family:Arial,sans-serif;
-    }
-    body{
-        background:#f5f5f5;
-    }
-    header{
-        background:#ffffff;
-        padding:20px;
-        text-align:center;
-        box-shadow:0 2px 10px rgba(0,0,0,0.1);
-    }
-    header h1{
-        color:#007bff;
-    }
-    .hero{
-        text-align:center;
-        padding:50px 20px;
-    }
-    .games{
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-        gap:20px;
-        padding:20px;
-    }
-    .card{
-        background:white;
-        padding:20px;
-        border-radius:10px;
-        text-align:center;
-        box-shadow:0 2px 8px rgba(0,0,0,0.1);
-    }
-    .card button{
-        margin-top:10px;
-        padding:10px 20px;
-        border:none;
-        background:#007bff;
-        color:white;
-        border-radius:5px;
-        cursor:pointer;
-    }
-    footer{
-        text-align:center;
-        padding:20px;
-        background:white;
-        margin-top:30px;
-    }
+body{
+font-family:Arial;
+background:#f5f5f5;
+margin:0;
+}
+
+header{
+background:#fff;
+padding:20px;
+text-align:center;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.container{
+padding:20px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:15px;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+button{
+padding:10px;
+border:none;
+background:#007bff;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+#orderBox, #paymentBox, #adminBox{
+display:none;
+background:white;
+margin:20px;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,0.2);
+}
 </style>
 </head>
+
 <body>
 
 <header>
-    <h1>DHAKA SELLER</h1>
-    <p>Fast & Trusted Game Top-Up Shop</p>
+<h1>DHAKA SELLER</h1>
+<p>Fast Game Top-Up Shop</p>
 </header>
 
-<section class="hero">
-    <h2>Welcome to DHAKA SELLER</h2>
-    <p>Buy Diamonds, Coins & Game Credits Easily</p>
-</section>
+<div class="container">
 
-<section class="games">
-    <div class="card">
-        <h3>Free Fire</h3>
-        <button>Buy Now</button>
-    </div>
+<div class="card">
+<h3>Free Fire</h3>
+<button onclick="buy('Free Fire')">Buy</button>
+</div>
 
-    <div class="card">
-        <h3>eFootball</h3>
-        <button>Buy Now</button>
-    </div>
+<div class="card">
+<h3>eFootball</h3>
+<button onclick="buy('eFootball')">Buy</button>
+</div>
 
-    <div class="card">
-        <h3>Roblox</h3>
-        <button>Buy Now</button>
-    </div>
+<div class="card">
+<h3>Roblox</h3>
+<button onclick="buy('Roblox')">Buy</button>
+</div>
 
-    <div class="card">
-        <h3>Minecraft</h3>
-        <button>Buy Now</button>
-    </div>
+<div class="card">
+<h3>Minecraft</h3>
+<button onclick="buy('Minecraft')">Buy</button>
+</div>
 
-    <div class="card">
-        <h3>FC Mobile</h3>
-        <button>Buy Now</button>
-    </div>
-</section>
+<div class="card">
+<h3>FC Mobile</h3>
+<button onclick="buy('FC Mobile')">Buy</button>
+</div>
 
-<footer>
-    <p>Payment: bKash & Nagad</p>
-    <p>© 2026 DHAKA SELLER</p>
-</footer>
+</div>
+
+<!-- ORDER -->
+<div id="orderBox">
+<h2>Place Order</h2>
+<p id="gameName"></p>
+<input id="uid" placeholder="Enter Game UID"><br><br>
+<button onclick="goPayment()">Next</button>
+</div>
+
+<!-- PAYMENT -->
+<div id="paymentBox">
+<h2>Payment</h2>
+<p>Send money to:</p>
+<p><b>bKash / Nagad: 01XXXXXXXXX</b></p>
+<p id="finalGame"></p>
+<button onclick="confirmOrder()">I Paid</button>
+</div>
+
+<!-- ADMIN -->
+<div id="adminBox">
+<h2>Admin Panel</h2>
+<p>New Orders will show here (demo only)</p>
+<div id="orders"></div>
+</div>
+
+<script>
+
+let selectedGame = "";
+
+function buy(game){
+selectedGame = game;
+document.getElementById("gameName").innerText = "Game: " + game;
+document.getElementById("orderBox").style.display = "block";
+window.scrollTo(0,500);
+}
+
+function goPayment(){
+let uid = document.getElementById("uid").value;
+if(uid==""){
+alert("Enter UID first");
+return;
+}
+document.getElementById("orderBox").style.display="none";
+document.getElementById("paymentBox").style.display="block";
+document.getElementById("finalGame").innerText = selectedGame + " | UID: " + uid;
+}
+
+function confirmOrder(){
+alert("Order Received!");
+document.getElementById("paymentBox").style.display="none";
+
+let div = document.getElementById("orders");
+div.innerHTML += "<p>New Order: " + selectedGame + "</p>";
+}
+
+</script>
 
 </body>
 </html>
