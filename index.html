@@ -216,19 +216,29 @@ const admin=document.getElementById("admin");
 const adminOrders=document.getElementById("adminOrders");  
   
 /* AUTH */  
-window.signup=async()=>{  
-let e=prompt("Email");  
-let p=prompt("Password");  
-await createUserWithEmailAndPassword(auth,e,p);  
-alert("Account Created");  
-};  
-  
-window.login=async()=>{  
-let e=prompt("Email");  
-let p=prompt("Password");  
-await signInWithEmailAndPassword(auth,e,p);  
-alert("Logged In");  
-};  
+window.signup = async () => {
+  try{
+    let e = prompt("Email");
+    let p = prompt("Password");
+    await createUserWithEmailAndPassword(auth, e, p);
+    alert("Account Created Successfully");
+  }catch(err){
+    alert(err.message);
+    console.log(err);
+  }
+};
+
+window.login = async () => {
+  try{
+    let e = prompt("Email");
+    let p = prompt("Password");
+    await signInWithEmailAndPassword(auth, e, p);
+    alert("Login Successful");
+  }catch(err){
+    alert(err.message);
+    console.log(err);
+  }
+};
   
 onAuthStateChanged(auth,(u)=>{  
 user=u;  
