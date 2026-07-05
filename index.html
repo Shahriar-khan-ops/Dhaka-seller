@@ -15,6 +15,38 @@ text-align:center;
 font-weight:bold;
 }
 
+/* =======================
+VERTICAL BANNER (ADDED)
+======================= */
+.v-banner{
+height:40px;
+overflow:hidden;
+background:#22c55e;
+color:black;
+font-weight:bold;
+display:flex;
+align-items:center;
+}
+
+.v-item{
+height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+animation:slideUp 8s infinite;
+}
+
+@keyframes slideUp {
+0%{transform:translateY(0)}
+20%{transform:translateY(0)}
+25%{transform:translateY(-40px)}
+45%{transform:translateY(-40px)}
+50%{transform:translateY(-80px)}
+70%{transform:translateY(-80px)}
+75%{transform:translateY(-120px)}
+100%{transform:translateY(0)}
+}
+
 .nav{
 display:flex;
 justify-content:space-around;
@@ -92,6 +124,16 @@ color:white;
 <body>
 
 <header>AMS TOPUP PRO MAX</header>
+
+<!-- =======================
+🔥 VERTICAL BANNER (HERE ADDED)
+======================= -->
+<div class="v-banner">
+  <div class="v-item">🔥 Free Fire Diamond Sale</div>
+  <div class="v-item">⚡ Instant Delivery 1-5 Min</div>
+  <div class="v-item">💰 bKash / Nagad Payment</div>
+  <div class="v-item">🎮 All Games Available</div>
+</div>
 
 <div class="nav">
 <button onclick="showHome()">Home</button>
@@ -358,7 +400,7 @@ await updateDoc(doc(db,"orders",id),{status});
 };
 
 /* NAV */
-window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}
+window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="block";}
 window.showOrders=()=>{home.style.display="none";orders.style.display="block";profile.style.display="none";}
 window.showProfile=()=>{home.style.display="none";orders.style.display="none";profile.style.display="block";}
 
