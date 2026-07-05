@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMS TopUp Pro</title>
+<title>AMS TopUp Pro FIXED</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:white}
@@ -15,9 +15,7 @@ text-align:center;
 font-weight:bold;
 }
 
-/* =======================
-VERTICAL BANNER (ADDED)
-======================= */
+/* BANNER */
 .v-banner{
 height:40px;
 overflow:hidden;
@@ -123,11 +121,9 @@ color:white;
 
 <body>
 
-<header>AMS TOPUP PRO MAX</header>
+<header>AMS TOPUP PRO FIXED</header>
 
-<!-- =======================
-🔥 VERTICAL BANNER (HERE ADDED)
-======================= -->
+<!-- BANNER -->
 <div class="v-banner">
   <div class="v-item">🔥 Free Fire Diamond Sale</div>
   <div class="v-item">⚡ Instant Delivery 1-5 Min</div>
@@ -135,24 +131,30 @@ color:white;
   <div class="v-item">🎮 All Games Available</div>
 </div>
 
+<!-- NAV -->
 <div class="nav">
 <button onclick="showHome()">Home</button>
 <button onclick="showOrders()">Orders</button>
 <button onclick="showProfile()">Profile</button>
 </div>
 
+<!-- HOME -->
 <div id="home">
 <div class="grid" id="products"></div>
 </div>
 
+<!-- ORDERS -->
 <div id="orders" style="display:none;padding:15px"></div>
 
+<!-- PROFILE -->
 <div id="profile" style="display:none;padding:15px"></div>
 
+<!-- POPUP -->
 <div class="popup" id="popup"></div>
 
+<!-- ADMIN -->
 <div class="popup" id="admin">
-<h3>Admin Panel (Live)</h3>
+<h3>Admin Panel</h3>
 <div id="adminOrders"></div>
 <button onclick="closeAdmin()" style="background:red">Close</button>
 </div>
@@ -193,6 +195,11 @@ let user=null;
 let currentGame="";
 let selectedPack="";
 let selectedPrice=0;
+
+/* SAFE DOM REFERENCES */
+const home = document.getElementById("home");
+const orders = document.getElementById("orders");
+const profile = document.getElementById("profile");
 
 /* AUTH */
 window.signup = async ()=>{
@@ -309,7 +316,7 @@ await uploadBytes(r,file);
 imgURL=await getDownloadURL(r);
 }
 
-/* WHATSAPP LINK */
+/* WHATSAPP */
 let wa=`https://wa.me/8801XXXXXXXXX?text=New Order: ${currentGame} ${selectedPack} UID:${uid}`;
 document.getElementById("waLink").href=wa;
 document.getElementById("waLink").innerText="Send WhatsApp Message";
@@ -344,7 +351,7 @@ if(x.user===user?.email){
 out+=`
 <p>
 ${x.game} - ${x.pack}<br>
-Status:${x.status}
+Status: ${x.status}
 </p><hr>`;
 }
 });
@@ -356,7 +363,8 @@ document.getElementById("orders").innerHTML=out;
 /* PROFILE */
 window.loadProfile=()=>{
 if(!user){
-profile.innerHTML=`<button onclick="login()">Login</button>
+profile.innerHTML=`
+<button onclick="login()">Login</button>
 <button onclick="signup()">Signup</button>`;
 return;
 }
@@ -364,7 +372,7 @@ return;
 profile.innerHTML=`Logged in: ${user.email}`;
 };
 
-/* ADMIN LIVE */
+/* ADMIN */
 window.adminLogin=()=>{
 let pass=prompt("Admin Password");
 if(pass!="1234")return;
@@ -382,7 +390,7 @@ out+=`
 <p>
 ${x.game} | ${x.pack}<br>
 ${x.user}<br>
-Status:${x.status}
+Status: ${x.status}
 <button onclick="updateStatus('${d.id}','done')">Done</button>
 <button onclick="updateStatus('${d.id}','cancel')">Cancel</button>
 <hr>
@@ -399,13 +407,13 @@ window.updateStatus=async(id,status)=>{
 await updateDoc(doc(db,"orders",id),{status});
 };
 
-/* NAV */
-window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="block";}
+/* NAV FIXED */
+window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}
 window.showOrders=()=>{home.style.display="none";orders.style.display="block";profile.style.display="none";}
 window.showProfile=()=>{home.style.display="none";orders.style.display="none";profile.style.display="block";}
 
-window.closePopup=()=>popup.style.display="none";
-window.closeAdmin=()=>admin.style.display="none";
+window.closePopup=()=>document.getElementById("popup").style.display="none";
+window.closeAdmin=()=>document.getElementById("admin").style.display="none";
 
 </script>
 
