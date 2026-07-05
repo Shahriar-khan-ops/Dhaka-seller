@@ -3,15 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHAKA SELLER PRO</title>
+<title>TopUp Shop Pro</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial;background:#f1f5f9}
+body{margin:0;font-family:Arial;background:#0f172a;color:white}
 
 header{
 background:#111827;
-color:white;
 padding:20px;
 text-align:center;
 }
@@ -24,21 +22,20 @@ padding:20px;
 }
 
 .card{
-background:white;
+background:#1e293b;
 padding:20px;
-border-radius:15px;
+border-radius:12px;
 text-align:center;
-box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
 button{
-background:#2563eb;
-color:white;
+background:#22c55e;
 border:none;
-padding:10px 15px;
+padding:10px;
 border-radius:8px;
-margin-top:10px;
+color:white;
 cursor:pointer;
+margin-top:10px;
 }
 
 .popup{
@@ -48,29 +45,30 @@ top:50%;
 left:50%;
 transform:translate(-50%,-50%);
 background:white;
+color:black;
 padding:20px;
+border-radius:12px;
 width:90%;
-max-width:350px;
-border-radius:15px;
-box-shadow:0 0 20px rgba(0,0,0,.2);
-z-index:1000;
+max-width:360px;
+z-index:999;
 }
 
 input{
 width:100%;
 padding:10px;
-margin:10px 0;
+margin:8px 0;
 }
 
-.admin{
+.adminBtn{
 position:fixed;
-bottom:15px;
-right:15px;
-background:black;
-border-radius:50%;
+bottom:20px;
+right:20px;
 width:50px;
 height:50px;
+border-radius:50%;
+background:black;
 color:white;
+border:none;
 }
 </style>
 </head>
@@ -78,24 +76,21 @@ color:white;
 <body>
 
 <header>
-<h1>DHAKA SELLER PRO</h1>
-<p>Games • Topup • Instant Order System</p>
+<h2>TOPUP SHOP PRO</h2>
+<p>Instant Games Top-Up System</p>
 </header>
 
-<!-- PRODUCTS -->
 <div class="grid" id="products"></div>
 
-<!-- ORDER -->
-<div class="popup" id="order"></div>
+<div class="popup" id="popup"></div>
 
-<!-- ADMIN -->
 <div class="popup" id="admin">
-<h2>Admin Dashboard</h2>
+<h3>Admin Panel</h3>
 <div id="orders"></div>
-<button onclick="closeAdmin()">Close</button>
+<button onclick="closeAdmin()" style="background:red">Close</button>
 </div>
 
-<button class="admin" onclick="adminLogin()">A</button>
+<button class="adminBtn" onclick="adminLogin()">A</button>
 
 <script type="module">
 
@@ -123,41 +118,43 @@ const products = [
 "eFootball",
 "Roblox",
 "Minecraft",
-"FC Mobile"
+"FC Mobile",
+"PUBG UC",
+"Valorant Points"
 ];
 
-let productHTML = "";
+let html = "";
 products.forEach(p=>{
-productHTML += `
+html += `
 <div class="card">
 <h3>${p}</h3>
-<button onclick="buy('${p}')">Buy</button>
+<button onclick="openBuy('${p}')">Buy</button>
 </div>
 `;
 });
-document.getElementById("products").innerHTML = productHTML;
+document.getElementById("products").innerHTML = html;
 
 /* BUY */
-window.buy = function(game){
+window.openBuy = function(game){
 current = game;
 
-document.getElementById("order").innerHTML = `
-<h2>${game} Order</h2>
+document.getElementById("popup").innerHTML = `
+<h3>${game} Top-Up</h3>
 
-<input id="uid" placeholder="Enter UID / Email / Username">
+<input id="uid" placeholder="Enter ID / Email">
 <input id="whatsapp" placeholder="WhatsApp Number">
 
-<p>bKash/Nagad: 01XXXXXXXXX</p>
+<p>Payment: bKash / Nagad</p>
 
-<button onclick="confirmOrder()">Confirm Order</button>
-<button onclick="closeBox()" style="background:red">Close</button>
+<button onclick="submitOrder()">Confirm Order</button>
+<button onclick="closePopup()" style="background:red">Close</button>
 `;
 
-document.getElementById("order").style.display="block";
+document.getElementById("popup").style.display="block";
 };
 
-/* CONFIRM ORDER */
-window.confirmOrder = async function(){
+/* SUBMIT ORDER */
+window.submitOrder = async function(){
 
 if(isSubmitting) return;
 isSubmitting = true;
@@ -171,6 +168,7 @@ isSubmitting = false;
 return;
 }
 
+try{
 await addDoc(collection(db,"orders"),{
 game: current,
 uid: uid,
@@ -179,15 +177,19 @@ status: "pending",
 time: new Date().toLocaleString()
 });
 
-alert("Order Submitted!");
-closeBox();
+alert("Order Placed!");
+closePopup();
+
+}catch(e){
+alert("Error!");
+}
 
 isSubmitting = false;
 };
 
-/* CLOSE */
-window.closeBox = function(){
-document.getElementById("order").style.display="none";
+/* CLOSE POPUP */
+window.closePopup = function(){
+document.getElementById("popup").style.display="none";
 };
 
 /* ADMIN LOGIN */
@@ -204,15 +206,15 @@ document.getElementById("admin").style.display="block";
 
 let snap = await getDocs(collection(db,"orders"));
 
-let html = "";
+let out = "";
 
 snap.forEach(doc=>{
 let d = doc.data();
 
-html += `
+out += `
 <p>
 🎮 ${d.game}<br>
-UID: ${d.uid}<br>
+ID: ${d.uid}<br>
 WhatsApp: ${d.whatsapp}<br>
 Status: ${d.status}
 <hr>
@@ -220,7 +222,7 @@ Status: ${d.status}
 `;
 });
 
-document.getElementById("orders").innerHTML = html || "No Orders";
+document.getElementById("orders").innerHTML = out || "No Orders";
 };
 
 /* CLOSE ADMIN */
