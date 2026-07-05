@@ -4,8 +4,91 @@
 <meta charset="UTF-8">
 <title>ZISAN ADMIN</title>
 </head>
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0f172a;
+color:white;
+}
 
+header{
+background:#111827;
+padding:15px;
+text-align:center;
+}
+
+.container{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:#1e293b;
+padding:25px;
+text-align:center;
+border-radius:15px;
+font-size:20px;
+cursor:pointer;
+transition:.3s;
+}
+
+.card:hover{
+transform:scale(1.03);
+background:#22c55e;
+}
+
+#content{
+padding:20px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+background:#22c55e;
+color:white;
+font-size:16px;
+}
+</style>
+  
 <body>
+<header>
+<h2>👑 ZISAN ADMIN PANEL</h2>
+</header>
 
+<div class="container">
+
+<div class="card" onclick="openProducts()">
+📦
+<h3>Products</h3>
+<p>Add / Edit / Delete</p>
+</div>
+
+<div class="card" onclick="openOrders()">
+📋
+<h3>Orders</h3>
+<p>Manage Orders</p>
+</div>
+
+<div class="card" onclick="openSettings()">
+⚙️
+<h3>Settings</h3>
+<p>Payment & Banner</p>
+</div>
+
+<div class="card" onclick="logoutAdmin()">
+🚪
+<h3>Logout</h3>
+</div>
+
+</div>
+
+<div id="content"></div>
+  
 </body>
 </html>
