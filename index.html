@@ -410,12 +410,20 @@ out+=`<p>${x.game} - ${x.pack}<br>${x.status}</p><hr>`;
 orders.innerHTML=out;  
 });  
 };  
+window.logout = async () => {
+  try{
+    await signOut(auth);
+    alert("Logged Out");
+  }catch(err){
+    alert(err.message);
+    console.log(err);
+  }
+};
   
 /* PROFILE */
-window.loadProfile=()=>{
+window.loadProfile = () => {
 
 if(!user){
-
 profile.innerHTML=`
 <div style="padding:20px;text-align:center">
 
@@ -462,6 +470,8 @@ profile.innerHTML=`
 
 <p><b>Email:</b> ${user.email}</p>
 
+<p><b>Total Spent:</b> ৳<span id="spent">0</span></p>
+
 <button
 onclick="logout()"
 style="
@@ -477,6 +487,20 @@ Logout
 
 </div>
 `;
+
+onSnapshot(collection(db,"orders"),(snap)=>{
+let total=0;
+
+snap.forEach(d=>{
+let x=d.data();
+
+if(x.user===user.email){
+total += Number(x.price || 0);
+}
+});
+
+document.getElementById("spent").innerText = total;
+});
 };
   
 /* ADMIN */  
