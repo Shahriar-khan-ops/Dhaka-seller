@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>ZISAN ADMIN</title>
-
+  
+localStorage.setItem("products", JSON.stringify(products));
+  
 <style>
 body{
 margin:0;
@@ -91,7 +93,31 @@ alert("Add Product clicked");
 </script>
 
 </head>
+<script>
+let products = JSON.parse(localStorage.getItem("products")) || [];
 
+function loadProducts(){
+let html = "";
+
+if(products.length === 0){
+html = "<p>No products found</p>";
+} else {
+products.forEach(p => {
+html += `
+<div style="background:#1e293b;color:white;padding:10px;margin:10px;border-radius:10px;">
+<h3>${p.name}</h3>
+<p>Price: ${p.price}</p>
+</div>
+`;
+});
+}
+
+document.getElementById("productList").innerHTML = html;
+}
+
+loadProducts();
+</script>
+  
 <body>
 <header>
 <h2>👑 ZISAN ADMIN PANEL</h2>
