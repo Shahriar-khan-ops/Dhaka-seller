@@ -308,51 +308,80 @@ popup.innerHTML=out;
 popup.style.display="block";  
 };  
   
-/* PACK */  
-window.selectPack=(g,p,pr)=>{  
-currentGame=g;  
-selectedPack=p;  
-selectedPrice=pr;  
+/* PACK */
+window.selectPack=(g,p,pr)=>{
+currentGame=g;
+selectedPack=p;
+selectedPrice=pr;
+
+if(g==="eFootball"){
+popup.innerHTML=`
+<h3>${g}</h3>
+
+<input id="konamiEmail" placeholder="Konami Gmail">
+<input id="konamiPass" type="password" placeholder="Konami Password">
+<input id="whatsapp" placeholder="WhatsApp Number">
+
+<select id="payment">
+<option>bKash</option>
+<option>Nagad</option>
+</select>
+
+<button onclick="placeOrder()">Place Order</button>
+<button onclick="closePopup()" style="background:red">Close</button>
+`;
+}else{
+popup.innerHTML=`
+<h3>${g}</h3>
+
+<input id="uid" placeholder="UID">
+<input id="whatsapp" placeholder="WhatsApp Number">
+
+<select id="payment">
+<option>bKash</option>
+<option>Nagad</option>
+</select>
+
+<button onclick="placeOrder()">Place Order</button>
+<button onclick="closePopup()" style="background:red">Close</button>
+`;
+}
+};
   
-popup.innerHTML=`  
-<h3>${g}</h3>  
-<input id="uid" placeholder="UID">  
-<input id="whatsapp" placeholder="WhatsApp">  
-<select id="payment">  
-<option>bKash</option>  
-<option>Nagad</option>  
-</select>  
-  
-<button onclick="placeOrder()">Place Order</button>  
-<button onclick="closePopup()" style="background:red">Close</button>  
-`;  
-};  
-  
-/* ORDER */  
-window.placeOrder=async()=>{  
-  
-if(!user){  
-alert("Login required");  
-return;  
-}  
-  
-let uid=document.getElementById("uid").value;  
-let whatsapp=document.getElementById("whatsapp").value;  
-  
-await addDoc(collection(db,"orders"),{  
-user:user.email,  
-game:currentGame,  
-pack:selectedPack,  
-price:selectedPrice,  
-uid,  
-whatsapp,  
-status:"pending",  
-time:new Date().toLocaleString()  
-});  
-  
-alert("Order Placed");  
-closePopup();  
-};  
+/* ORDER */
+window.placeOrder=async()=>{
+
+if(!user){
+alert("Login required");
+return;
+}
+
+let orderData={
+user:user.email,
+game:currentGame,
+pack:selectedPack,
+price:selectedPrice,
+whatsapp:document.getElementById("whatsapp").value,
+status:"pending",
+time:new Date().toLocaleString()
+};
+
+if(currentGame==="eFootball"){
+orderData.konamiEmail=
+document.getElementById("konamiEmail").value;
+
+orderData.konamiPass=
+document.getElementById("konamiPass").value;
+}else{
+orderData.uid=
+document.getElementById("uid").value;
+}
+
+await addDoc(collection(db,"orders"),orderData);
+
+alert("Order Placed");
+closePopup();
+};
   
 /* ORDERS */  
 window.loadOrders=()=>{  
