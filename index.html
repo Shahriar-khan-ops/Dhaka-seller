@@ -177,24 +177,47 @@ const db=getFirestore(app);
 let current="";
 
 window.buy=function(game){
+
 current=game;
-document.getElementById("title").innerText=game;
+
+let html="";
+
+if(game=="Roblox"){
+html=`
+<h2>Roblox Order</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<input id="whatsapp" placeholder="WhatsApp Number">
+`;
+}
+
+else if(game=="eFootball"){
+html=`
+<h2>eFootball Order</h2>
+<input id="gmail" placeholder="Konami Gmail">
+<input id="gmailpass" type="password" placeholder="Gmail Password">
+<input id="whatsapp" placeholder="WhatsApp Number">
+`;
+}
+
+else if(game=="Free Fire"){
+html=`
+<h2>Free Fire Order</h2>
+<input id="uid" placeholder="Player UID">
+<input id="server" placeholder="Server">
+<input id="whatsapp" placeholder="WhatsApp Number">
+`;
+}
+
+document.getElementById("order").innerHTML =
+html +
+`
+<p>bKash/Nagad: 01XXXXXXXXX</p>
+<button onclick="confirmOrder()">Confirm Order</button>
+`;
+
 document.getElementById("order").style.display="block";
 }
-
-window.closeBox=function(){
-document.getElementById("order").style.display="none";
-}
-
-window.confirmOrder=async function(){
-
-let uid=document.getElementById("uid").value;
-
-if(uid==""){
-alert("Enter UID");
-return;
-}
-
 await addDoc(collection(db,"orders"),{
 game:current,
 uid:uid,
