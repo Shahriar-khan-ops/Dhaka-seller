@@ -341,9 +341,20 @@ popup.innerHTML=`
 <option>Nagad</option>
 </select>
 
+<p>Send Money: <b>01917441304</b></p>
+
+<input
+id="sender"
+placeholder="Your bKash/Nagad Number">
+
+<input
+id="trxid"
+placeholder="Transaction ID (TRX ID)">
+
 <button onclick="placeOrder()">Place Order</button>
 <button onclick="closePopup()" style="background:red">Close</button>
 `;
+  
 }else{
 popup.innerHTML=`
 <h3>${g}</h3>
@@ -356,11 +367,23 @@ popup.innerHTML=`
 <option>Nagad</option>
 </select>
 
+<p>Send Money: <b>01917441304</b></p>
+
+<input
+id="sender"
+placeholder="Your bKash/Nagad Number">
+
+<input
+id="trxid"
+placeholder="Transaction ID (TRX ID)">
+
 <button onclick="placeOrder()">Place Order</button>
-<button onclick="closePopup()" style="background:red">Close</button>
+
+<button onclick="closePopup()" style="background:red">
+Close
+</button>
 `;
 }
-};
   
 /* ORDER */
 window.placeOrder=async()=>{
@@ -376,6 +399,8 @@ game:currentGame,
 pack:selectedPack,
 price:selectedPrice,
 payment:document.getElementById("payment").value,
+sender: document.getElementById("sender").value,
+trxid: document.getElementById("trxid").value,
 whatsapp:document.getElementById("whatsapp").value,
 status:"pending",
 time:new Date().toLocaleString()
