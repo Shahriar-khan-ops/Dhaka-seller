@@ -143,7 +143,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let current = "";
-
+let isSubmitting = false;
+let current = "";
 window.buy = function(game){
 current = game;
 
@@ -171,7 +172,33 @@ if(!uid || !whatsapp){
 alert("Fill all fields");
 return;
 }
+window.confirmOrder = async function () {
 
+if (isSubmitting) return;
+isSubmitting = true;
+
+let uid = document.getElementById("uid").value;
+let whatsapp = document.getElementById("whatsapp").value;
+
+if(!uid || !whatsapp){
+alert("Fill all fields");
+isSubmitting = false;
+return;
+}
+
+await addDoc(collection(db,"orders"),{
+game: current,
+uid: uid,
+whatsapp: whatsapp,
+status: "pending",
+time: new Date().toLocaleString()
+});
+
+alert("Order Submitted!");
+closeBox();
+
+isSubmitting = false;
+};
 await addDoc(collection(db,"orders"),{
 game: current,
 uid: uid,
