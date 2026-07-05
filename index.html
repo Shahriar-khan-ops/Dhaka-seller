@@ -740,7 +740,7 @@ snap.forEach(d=>{
 
 let x = d.data();
 
-if(x.user === user.email){
+if(user && x.user === user.email){
 
 totalOrders++;
 
