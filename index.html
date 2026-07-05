@@ -62,8 +62,6 @@ padding:10px;
 margin:10px 0;
 }
 
-.close{background:red}
-
 .admin{
 position:fixed;
 bottom:15px;
@@ -80,47 +78,21 @@ color:white;
 <body>
 
 <header>
-<h1>DHAKA SELLER</h1>
-<p>Free Fire • eFootball • Roblox • Minecraft • FC Mobile</p>
+<h1>DHAKA SELLER PRO</h1>
+<p>Games • Topup • Instant Order System</p>
 </header>
 
-<div class="grid">
-
-<div class="card">
-<h3>Free Fire</h3>
-<button onclick="buy('Free Fire')">Buy</button>
-</div>
-
-<div class="card">
-<h3>eFootball</h3>
-<button onclick="buy('eFootball')">Buy</button>
-</div>
-
-<div class="card">
-<h3>Roblox</h3>
-<button onclick="buy('Roblox')">Buy</button>
-</div>
-
-<div class="card">
-<h3>Minecraft</h3>
-<button onclick="buy('Minecraft')">Buy</button>
-</div>
-
-<div class="card">
-<h3>FC Mobile</h3>
-<button onclick="buy('FC Mobile')">Buy</button>
-</div>
-
-</div>
+<!-- PRODUCTS -->
+<div class="grid" id="products"></div>
 
 <!-- ORDER -->
 <div class="popup" id="order"></div>
 
 <!-- ADMIN -->
 <div class="popup" id="admin">
-<h2>Admin Orders</h2>
+<h2>Admin Dashboard</h2>
 <div id="orders"></div>
-<button class="close" onclick="closeAdmin()">Close</button>
+<button onclick="closeAdmin()">Close</button>
 </div>
 
 <button class="admin" onclick="adminLogin()">A</button>
@@ -144,37 +116,50 @@ const db = getFirestore(app);
 
 let current = "";
 let isSubmitting = false;
-let current = "";
+
+/* PRODUCTS */
+const products = [
+"Free Fire",
+"eFootball",
+"Roblox",
+"Minecraft",
+"FC Mobile"
+];
+
+let productHTML = "";
+products.forEach(p=>{
+productHTML += `
+<div class="card">
+<h3>${p}</h3>
+<button onclick="buy('${p}')">Buy</button>
+</div>
+`;
+});
+document.getElementById("products").innerHTML = productHTML;
+
+/* BUY */
 window.buy = function(game){
 current = game;
 
 document.getElementById("order").innerHTML = `
 <h2>${game} Order</h2>
 
-<input id="uid" placeholder="Enter UID / Username / Email">
+<input id="uid" placeholder="Enter UID / Email / Username">
 <input id="whatsapp" placeholder="WhatsApp Number">
 
 <p>bKash/Nagad: 01XXXXXXXXX</p>
 
 <button onclick="confirmOrder()">Confirm Order</button>
-<button class="close" onclick="closeBox()">Close</button>
+<button onclick="closeBox()" style="background:red">Close</button>
 `;
 
 document.getElementById("order").style.display="block";
 };
 
+/* CONFIRM ORDER */
 window.confirmOrder = async function(){
 
-let uid = document.getElementById("uid").value;
-let whatsapp = document.getElementById("whatsapp").value;
-
-if(!uid || !whatsapp){
-alert("Fill all fields");
-return;
-}
-window.confirmOrder = async function () {
-
-if (isSubmitting) return;
+if(isSubmitting) return;
 isSubmitting = true;
 
 let uid = document.getElementById("uid").value;
@@ -199,27 +184,18 @@ closeBox();
 
 isSubmitting = false;
 };
-await addDoc(collection(db,"orders"),{
-game: current,
-uid: uid,
-whatsapp: whatsapp,
-status: "pending",
-time: new Date().toLocaleString()
-});
 
-alert("Order Submitted!");
-closeBox();
+/* CLOSE */
+window.closeBox = function(){
+document.getElementById("order").style.display="none";
 };
 
-function closeBox(){
-document.getElementById("order").style.display="none";
-}
-
+/* ADMIN LOGIN */
 window.adminLogin = async function(){
 
 let pass = prompt("Admin Password");
 
-if(pass != "1234"){
+if(pass !== "1234"){
 alert("Wrong Password");
 return;
 }
@@ -237,7 +213,7 @@ html += `
 <p>
 🎮 ${d.game}<br>
 UID: ${d.uid}<br>
-WhatsApp: ${d.whatsapp || "-"}<br>
+WhatsApp: ${d.whatsapp}<br>
 Status: ${d.status}
 <hr>
 </p>
@@ -247,6 +223,7 @@ Status: ${d.status}
 document.getElementById("orders").innerHTML = html || "No Orders";
 };
 
+/* CLOSE ADMIN */
 window.closeAdmin = function(){
 document.getElementById("admin").style.display="none";
 };
