@@ -249,16 +249,33 @@ loadOrders();
 /* GAMES WITH LOGO */  
 const games=[  
   
-{  
-name:"Free Fire",  
-logo:"ff.png",  
-packs:[  
-{t:"50 Diamonds",p:45},  
-{t:"115 Diamonds",p:95},  
-{t:"520 Diamonds",p:420},  
-{t:"1060 Diamonds",p:840}  
-]  
-},  
+{
+name:"Free Fire",
+logo:"ff.png",
+packs:[
+{t:"💎 25 Diamonds",p:25},
+{t:"💎 50 Diamonds",p:45},
+{t:"💎 115 Diamonds",p:95},
+{t:"💎 240 Diamonds",p:190},
+{t:"💎 355 Diamonds",p:280},
+{t:"💎 480 Diamonds",p:380},
+{t:"💎 505 Diamonds",p:400},
+{t:"💎 610 Diamonds",p:480},
+{t:"💎 725 Diamonds",p:570},
+{t:"💎 850 Diamonds",p:670},
+{t:"🔥 💎 1060 Diamonds",p:840},
+{t:"💎 1240 Diamonds",p:980},
+{t:"💎 1450 Diamonds",p:1140},
+{t:"💎 2180 Diamonds",p:1690},
+{t:"💎 2530 Diamonds",p:1960},
+{t:"💎 3560 Diamonds",p:2750},
+{t:"⭐ Weekly Membership",p:160},
+{t:"⭐ Monthly Membership",p:780},
+{t:"🎫 Level Up Pass",p:180},
+{t:"🔥 Weekly Lite",p:80},
+{t:"👑 Booyah Pass",p:450}
+]
+},
   
 {  
 name:"eFootball",  
@@ -306,21 +323,90 @@ html+=`
 });  
 document.getElementById("products").innerHTML=html;  
   
-/* GAME */  
-window.openGame=(name)=>{  
-let g=games.find(x=>x.name===name);  
-  
-let out=`<h3>${name}</h3>`;  
-g.packs.forEach(p=>{  
-out+=`  
-<button onclick="selectPack('${name}','${p.t}',${p.p})">  
-${p.t} - ৳${p.p}  
-</button>`;  
-});  
-  
-popup.innerHTML=out;  
-popup.style.display="block";  
-};  
+/* GAME */
+window.openGame=(name)=>{
+
+let g=games.find(x=>x.name===name);
+
+let out=`
+<h2 style="
+text-align:center;
+margin-bottom:15px;
+color:#22c55e;
+">
+${name}
+</h2>
+`;
+
+g.packs.forEach(p=>{
+
+out+=`
+<div style="
+background:#1e293b;
+color:white;
+padding:15px;
+margin-bottom:10px;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+">
+
+<div>
+<div style="
+font-size:17px;
+font-weight:bold;
+">
+${p.t}
+</div>
+
+<div style="
+color:#22c55e;
+font-size:18px;
+font-weight:bold;
+margin-top:5px;
+">
+৳${p.p}
+</div>
+</div>
+
+<button
+style="
+background:#22c55e;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+"
+onclick="selectPack('${name}','${p.t}',${p.p})">
+Buy
+</button>
+
+</div>
+`;
+});
+
+out += `
+<button
+onclick="closePopup()"
+style="
+width:100%;
+padding:12px;
+background:red;
+border:none;
+border-radius:10px;
+color:white;
+margin-top:10px;
+">
+Close
+</button>
+`;
+
+popup.innerHTML=out;
+popup.style.display="block";
+};
   
 /* PACK */
 window.selectPack=(g,p,pr)=>{
