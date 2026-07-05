@@ -16,7 +16,49 @@ input{padding:8px;width:90%;margin-top:10px}
 .admin-btn{position:fixed;bottom:10px;right:10px;background:black;color:white;padding:10px;border-radius:50%}
 </style>
 </head>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
+  authDomain: "dhaka-seller.firebaseapp.com",
+  projectId: "dhaka-seller",
+  storageBucket: "dhaka-seller.firebasestorage.app",
+  messagingSenderId: "332523373651",
+  appId: "1:332523373651:web:e912f988d65c829b19f2a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.placeOrder = async function(game) {
+  const uid = document.getElementById("uid").value;
+
+  if (!uid) {
+    alert("Enter your UID");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "orders"), {
+      game: game,
+      uid: uid,
+      payment: "pending",
+      status: "pending",
+      createdAt: new Date().toISOString()
+    });
+
+    alert("Order submitted successfully!");
+  } catch (e) {
+    alert("Error: " + e.message);
+  }
+};
+</script>
 <body>
 
 <header>
