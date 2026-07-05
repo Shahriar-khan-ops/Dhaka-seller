@@ -519,7 +519,64 @@ let out="";
 snap.forEach(d=>{  
 let x=d.data();  
 if(x.user===user?.email){  
-out+=`<p>${x.game} - ${x.pack}<br>${x.status}</p><hr>`;  
+let statusColor="#facc15";
+let statusText="⏳ Pending";
+
+if(x.status==="completed"){
+statusColor="#22c55e";
+statusText="✅ Completed";
+}
+
+if(x.status==="cancelled"){
+statusColor="#ef4444";
+statusText="❌ Cancelled";
+}
+
+out += `
+<div style="
+background:#1e293b;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+border-left:4px solid ${statusColor};
+">
+
+<h3 style="margin:0;">
+🎮 ${x.game}
+</h3>
+
+<p style="margin:8px 0;">
+${x.pack}
+</p>
+
+<p style="
+color:#22c55e;
+font-weight:bold;
+">
+৳${x.price}
+</p>
+
+<span style="
+background:${statusColor};
+padding:6px 12px;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+color:black;
+">
+${statusText}
+</span>
+
+<p style="
+margin-top:10px;
+font-size:12px;
+color:#94a3b8;
+">
+🕒 ${x.time}
+</p>
+
+</div>
+`;  
 }  
 });  
 orders.innerHTML=out;  
