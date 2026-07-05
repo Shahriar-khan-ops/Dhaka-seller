@@ -512,13 +512,19 @@ alert("Order Placed");
 closePopup();
 };
   
-/* ORDERS */  
-window.loadOrders=()=>{  
-onSnapshot(collection(db,"orders"),(snap)=>{  
-let out="";  
-snap.forEach(d=>{  
-let x=d.data();  
-if(x.user===user?.email){  
+/* ORDERS */
+window.loadOrders=()=>{
+
+onSnapshot(collection(db,"orders"),(snap)=>{
+
+let out="";
+
+snap.forEach(d=>{
+
+let x=d.data();
+
+if(x.user===user?.email){
+
 let statusColor="#facc15";
 let statusText="⏳ Pending";
 
@@ -538,24 +544,34 @@ background:#1e293b;
 padding:15px;
 border-radius:12px;
 margin-bottom:12px;
-border-left:4px solid ${statusColor};
+border-left:5px solid ${statusColor};
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
 ">
 
-<h3 style="margin:0;">
+<h3 style="
+margin:0;
+color:white;
+">
 🎮 ${x.game}
 </h3>
 
-<p style="margin:8px 0;">
-${x.pack}
+<p style="
+margin:8px 0;
+color:#cbd5e1;
+">
+📦 ${x.pack}
 </p>
 
 <p style="
-color:#22c55e;
+margin:8px 0;
 font-weight:bold;
+color:#22c55e;
+font-size:18px;
 ">
-৳${x.price}
+💰 ৳${x.price}
 </p>
 
+<div style="margin:10px 0;">
 <span style="
 background:${statusColor};
 padding:6px 12px;
@@ -566,31 +582,39 @@ color:black;
 ">
 ${statusText}
 </span>
+</div>
 
 <p style="
-margin-top:10px;
 font-size:12px;
 color:#94a3b8;
+margin-top:10px;
 ">
 🕒 ${x.time}
 </p>
 
 </div>
-`;  
-}  
-});  
-orders.innerHTML=out;  
-});  
-};  
-window.logout = async () => {
-  try{
-    await signOut(auth);
-    alert("Logged Out");
-    showHome();
-  }catch(err){
-    alert(err.message);
-    console.log(err);
-  }
+`;
+
+}
+
+});
+
+if(out===""){
+out=`
+<div style="
+text-align:center;
+padding:40px;
+color:#94a3b8;
+">
+📦 No Orders Found
+</div>
+`;
+}
+
+orders.innerHTML=out;
+
+});
+
 };
   
 /* PROFILE */
