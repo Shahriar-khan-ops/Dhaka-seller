@@ -23,6 +23,15 @@ border-bottom:2px solid #22c55e;
 .logo{font-size:20px;font-weight:bold;}
 .tag{font-size:12px;opacity:0.7;}
 
+/* LOGO STYLE */
+.game-logo{
+width:60px;
+height:60px;
+object-fit:cover;
+border-radius:12px;
+margin-bottom:8px;
+}
+
 .v-banner{
 height:40px;
 overflow:hidden;
@@ -80,10 +89,7 @@ background:#1e293b;
 padding:15px;
 border-radius:15px;
 text-align:center;
-transition:0.2s;
 }
-
-.card:hover{transform:translateY(-4px);}
 
 .card button{
 width:100%;
@@ -179,10 +185,6 @@ import {
 getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-import {
-getStorage, ref, uploadBytes, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
-
 /* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
@@ -196,13 +198,11 @@ appId: "1:332523373651:web:e912f988d65c829b19f2a6"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
-const storage = getStorage();
 
 let user=null;
 let currentGame="";
 let selectedPack="";
 let selectedPrice=0;
-let isSubmitting=false;
 
 const home=document.getElementById("home");
 const orders=document.getElementById("orders");
@@ -232,16 +232,18 @@ loadProfile();
 loadOrders();
 });
 
-/* PRODUCTS */
+/* GAMES WITH LOGO */
 const games=[
-{ name:"Free Fire", packs:[{t:"50 Diamonds",p:45},{t:"115 Diamonds",p:95}] },
-{ name:"eFootball", packs:[{t:"500 Coins",p:120}] }
+{ name:"Free Fire", logo:"ff.png", packs:[{t:"50 Diamonds",p:45},{t:"115 Diamonds",p:95}] },
+{ name:"eFootball", logo:"football.png", packs:[{t:"500 Coins",p:120}] }
 ];
 
+/* PRODUCTS */
 let html="";
 games.forEach(g=>{
 html+=`
 <div class="card">
+<img src="${g.logo}" class="game-logo">
 <h3>${g.name}</h3>
 <button onclick="openGame('${g.name}')">Buy</button>
 </div>`;
@@ -278,52 +280,22 @@ popup.innerHTML=`
 <option>bKash</option>
 <option>Nagad</option>
 </select>
-<input type="file" id="img">
 
 <button onclick="placeOrder()">Place Order</button>
 <button onclick="closePopup()" style="background:red">Close</button>
-
-<a id="waLink" target="_blank"></a>
 `;
 };
 
-/* ORDER FIXED */
+/* ORDER */
 window.placeOrder=async()=>{
-
-if(isSubmitting) return;
-isSubmitting=true;
-
-try{
 
 if(!user){
 alert("Login required");
-isSubmitting=false;
 return;
 }
 
 let uid=document.getElementById("uid").value;
 let whatsapp=document.getElementById("whatsapp").value;
-
-if(!uid || !whatsapp){
-alert("Fill all fields");
-isSubmitting=false;
-return;
-}
-
-let file=document.getElementById("img")?.files[0];
-let imgURL="";
-
-if(file){
-let r=ref(storage,"payments/"+file.name);
-await uploadBytes(r,file);
-imgURL=await getDownloadURL(r);
-}
-
-let waText=`New Order: ${currentGame} ${selectedPack} UID:${uid}`;
-let wa=`https://wa.me/8801XXXXXXXXX?text=${encodeURIComponent(waText)}`;
-
-document.getElementById("waLink").href=wa;
-document.getElementById("waLink").innerText="Send WhatsApp";
 
 await addDoc(collection(db,"orders"),{
 user:user.email,
@@ -332,36 +304,24 @@ pack:selectedPack,
 price:selectedPrice,
 uid,
 whatsapp,
-payment:document.getElementById("payment").value,
-img:imgURL,
 status:"pending",
 time:new Date().toLocaleString()
 });
 
 alert("Order Placed");
 closePopup();
-
-}catch(e){
-alert("Error placing order");
-console.log(e);
-
-}finally{
-isSubmitting=false;
-}
 };
 
 /* ORDERS */
 window.loadOrders=()=>{
 onSnapshot(collection(db,"orders"),(snap)=>{
-let out="<h3>Orders</h3>";
-
+let out="";
 snap.forEach(d=>{
 let x=d.data();
 if(x.user===user?.email){
-out+=`<p>${x.game} - ${x.pack}<br>Status: ${x.status}</p><hr>`;
+out+=`<p>${x.game} - ${x.pack}<br>${x.status}</p><hr>`;
 }
 });
-
 orders.innerHTML=out;
 });
 };
@@ -384,28 +344,17 @@ admin.style.display="block";
 
 onSnapshot(collection(db,"orders"),(snap)=>{
 let out="";
-
 snap.forEach(d=>{
 let x=d.data();
-
 out+=`
-<div style="background:#111827;padding:10px;margin:5px;border-radius:8px">
-<b>${x.game}</b><br>
+<p>
+${x.game}<br>
 ${x.user}<br>
 ${x.status}
-<br>
-<button onclick="updateStatus('${d.id}','done')">Done</button>
-<button onclick="updateStatus('${d.id}','cancel')">Cancel</button>
-</div>`;
+</p>`;
 });
-
 adminOrders.innerHTML=out;
 });
-};
-
-/* STATUS */
-window.updateStatus=async(id,status)=>{
-await updateDoc(doc(db,"orders",id),{status});
 };
 
 /* NAV */
