@@ -156,17 +156,28 @@ document.getElementById("popup").style.display="block";
 /* SUBMIT ORDER */
 window.submitOrder = async function(){
 
-if(isSubmitting) return;
-isSubmitting = true;
-
 let uid = document.getElementById("uid").value;
 let whatsapp = document.getElementById("whatsapp").value;
 
 if(!uid || !whatsapp){
 alert("Fill all fields");
-isSubmitting = false;
 return;
 }
+
+/* 🔥 FIREBASE ORDER HERE (THIS IS THE RIGHT PLACE) */
+await addDoc(collection(db,"orders"),{
+game: current,
+pack: selectedPack,
+price: selectedPrice,
+uid: uid,
+whatsapp: whatsapp,
+status: "pending",
+time: new Date().toLocaleString()
+});
+
+alert("Order Placed!");
+closePopup();
+};
 
 try{
 await addDoc(collection(db,"orders"),{
