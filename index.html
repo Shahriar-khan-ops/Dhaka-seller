@@ -359,4 +359,13 @@ await updateDoc(doc(db,"orders",id),{status});
 
 /* NAV */
 window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}
-window.showOrders
+window.showOrders=()=>{home.style.display="none";orders.style.display="block";profile.style.display="none";}
+window.showProfile=()=>{home.style.display="none";orders.style.display="none";profile.style.display="block";}
+
+window.closePopup=()=>popup.style.display="none";
+window.closeAdmin=()=>admin.style.display="none";
+
+</script>
+
+</body>
+</html>
