@@ -6,199 +6,241 @@
 <title>DHAKA SELLER PRO</title>
 
 <style>
-body{font-family:Arial;margin:0;background:#eef1f6}
-header{background:#111;color:#fff;text-align:center;padding:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;padding:20px}
-.card{background:#fff;padding:15px;border-radius:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-button{padding:8px 12px;background:#007bff;color:#fff;border:none;border-radius:6px}
-.box{display:none;background:#fff;margin:20px;padding:15px;border-radius:10px}
-input{padding:8px;width:90%;margin-top:10px}
-.admin-btn{position:fixed;bottom:10px;right:10px;background:black;color:white;padding:10px;border-radius:50%}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+font-family:Arial;
+background:#f1f5f9;
+}
+
+header{
+background:#111827;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:8px;
+margin-top:10px;
+}
+
+.popup{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:20px;
+width:90%;
+max-width:350px;
+border-radius:15px;
+box-shadow:0 0 20px rgba(0,0,0,.2);
+z-index:1000;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+}
+
+.close{
+background:red;
+}
+
+.admin{
+position:fixed;
+bottom:15px;
+right:15px;
+background:black;
+border-radius:50%;
+width:50px;
+height:50px;
+}
 </style>
 </head>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
-  authDomain: "dhaka-seller.firebaseapp.com",
-  projectId: "dhaka-seller",
-  storageBucket: "dhaka-seller.firebasestorage.app",
-  messagingSenderId: "332523373651",
-  appId: "1:332523373651:web:e912f988d65c829b19f2a6"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.placeOrder = async function(game) {
-  const uid = document.getElementById("uid").value;
-
-  if (!uid) {
-    alert("Enter your UID");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, "orders"), {
-      game: game,
-      uid: uid,
-      payment: "pending",
-      status: "pending",
-      createdAt: new Date().toISOString()
-    });
-
-    alert("Order submitted successfully!");
-  } catch (e) {
-    alert("Error: " + e.message);
-  }
-};
-</script>
 <body>
 
 <header>
-<h2>DHAKA SELLER PRO</h2>
-<p>Premium Game Top-Up Shop</p>
+<h1>DHAKA SELLER</h1>
+<p>Free Fire • eFootball • Roblox • Minecraft • FC Mobile</p>
 </header>
 
 <div class="grid">
-<div class="card"><h3>Free Fire</h3><button onclick="buy('Free Fire')">Buy</button></div>
-<div class="card"><h3>eFootball</h3><button onclick="buy('eFootball')">Buy</button></div>
-<div class="card"><h3>Roblox</h3><button onclick="buy('Roblox')">Buy</button></div>
-<div class="card"><h3>Minecraft</h3><button onclick="buy('Minecraft')">Buy</button></div>
-<div class="card"><h3>FC Mobile</h3><button onclick="buy('FC Mobile')">Buy</button></div>
+
+<div class="card">
+<h3>Free Fire</h3>
+<button onclick="buy('Free Fire')">Buy</button>
+</div>
+
+<div class="card">
+<h3>eFootball</h3>
+<button onclick="buy('eFootball')">Buy</button>
+</div>
+
+<div class="card">
+<h3>Roblox</h3>
+<button onclick="buy('Roblox')">Buy</button>
+</div>
+
+<div class="card">
+<h3>Minecraft</h3>
+<button onclick="buy('Minecraft')">Buy</button>
+</div>
+
+<div class="card">
+<h3>FC Mobile</h3>
+<button onclick="buy('FC Mobile')">Buy</button>
+</div>
+
 </div>
 
 <!-- ORDER -->
-<div class="box" id="orderBox">
-<h3>Place Order</h3>
-<p id="game"></p>
-<input id="uid" placeholder="Enter Game UID">
-<button onclick="goPay()">Next</button>
+<div class="popup" id="order">
+<h2 id="title"></h2>
+
+<input id="uid" placeholder="Enter UID">
+
+<p>
+bKash/Nagad:<br>
+01XXXXXXXXX
+</p>
+
+<button onclick="confirmOrder()">
+Confirm Order
+</button>
+
+<button class="close" onclick="closeBox()">
+Close
+</button>
 </div>
 
-<!-- PAYMENT -->
-<div class="box" id="payBox">
-<h3>Payment</h3>
-<p>bKash/Nagad: 01XXXXXXXXX</p>
-<button onclick="confirmOrder()">Confirm Order</button>
+<!-- ADMIN -->
+<div class="popup" id="admin">
+<h2>Admin Orders</h2>
+<div id="orders"></div>
+<button class="close" onclick="closeAdmin()">
+Close
+</button>
 </div>
 
-<!-- ADMIN LOGIN -->
-<div class="box" id="adminLogin">
-<h3>Admin Login</h3>
-<input type="password" id="pass" placeholder="Password">
-<button onclick="login()">Login</button>
-</div>
+<button class="admin" onclick="adminLogin()">
+A
+</button>
 
-<!-- ADMIN PANEL -->
-<div class="box" id="adminPanel">
-<h3>Orders</h3>
-<div id="list"></div>
-</div>
+<script type="module">
 
-<div class="admin-btn" onclick="openAdmin()">A</div>
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
-<script>
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-let selectedGame="";
+const firebaseConfig = {
+apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
+authDomain: "dhaka-seller.firebaseapp.com",
+projectId: "dhaka-seller",
+storageBucket: "dhaka-seller.firebasestorage.app",
+messagingSenderId: "332523373651",
+appId: "1:332523373651:web:e912f988d65c829b19f2a6"
+};
 
-function buy(game){
-selectedGame=game;
-document.getElementById("orderBox").style.display="block";
-document.getElementById("game").innerText="Game: "+game;
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+let current="";
+
+window.buy=function(game){
+current=game;
+document.getElementById("title").innerText=game;
+document.getElementById("order").style.display="block";
 }
 
-function goPay(){
-let uid=document.getElementById("uid").value;
-if(uid===""){alert("Enter UID");return;}
-document.getElementById("orderBox").style.display="none";
-document.getElementById("payBox").style.display="block";
+window.closeBox=function(){
+document.getElementById("order").style.display="none";
 }
 
-function confirmOrder(){
+window.confirmOrder=async function(){
+
 let uid=document.getElementById("uid").value;
 
-let orders=JSON.parse(localStorage.getItem("orders")||"[]");
+if(uid==""){
+alert("Enter UID");
+return;
+}
 
-orders.push({
-game:selectedGame,
+await addDoc(collection(db,"orders"),{
+game:current,
 uid:uid,
+status:"pending",
 time:new Date().toLocaleString()
 });
 
-localStorage.setItem("orders",JSON.stringify(orders));
+alert("Order Submitted!");
 
-alert("Order Placed Successfully!");
-document.getElementById("payBox").style.display="none";
+document.getElementById("uid").value="";
+closeBox();
 }
 
-function openAdmin(){
-document.getElementById("adminLogin").style.display="block";
-}
+window.adminLogin=async function(){
 
-function login(){
-let pass=document.getElementById("pass").value;
-if(pass==="1234"){
-document.getElementById("adminLogin").style.display="none";
-document.getElementById("adminPanel").style.display="block";
+let pass=prompt("Admin Password");
 
-let orders=JSON.parse(localStorage.getItem("orders")||"[]");
-
-let html="";
-orders.forEach(o=>{
-html+=`<p>🎮 ${o.game} | UID: ${o.uid} | ⏰ ${o.time}</p>`;
-});
-
-document.getElementById("list").innerHTML=html || "No Orders";
-}
-else{
+if(pass!="1234"){
 alert("Wrong Password");
-}
-}
-
-</script>
-
-</body>
-</html></html><div id="adminBox">
-<h2>Admin Panel</h2>
-<p>New Orders will show here (demo only)</p>
-<div id="orders"></div>
-</div>
-
-<script>
-
-let selectedGame = "";
-
-function buy(game){
-selectedGame = game;
-document.getElementById("gameName").innerText = "Game: " + game;
-document.getElementById("orderBox").style.display = "block";
-window.scrollTo(0,500);
-}
-
-function goPayment(){
-let uid = document.getElementById("uid").value;
-if(uid==""){
-alert("Enter UID first");
 return;
 }
-document.getElementById("orderBox").style.display="none";
-document.getElementById("paymentBox").style.display="block";
-document.getElementById("finalGame").innerText = selectedGame + " | UID: " + uid;
+
+document.getElementById("admin").style.display="block";
+
+let snap=await getDocs(collection(db,"orders"));
+
+let html="";
+
+snap.forEach(doc=>{
+let d=doc.data();
+
+html+=`
+<p>
+🎮 ${d.game}<br>
+UID: ${d.uid}<br>
+Status: ${d.status}<hr>
+</p>
+`;
+});
+
+document.getElementById("orders").innerHTML=
+html || "No Orders";
 }
 
-function confirmOrder(){
-alert("Order Received!");
-document.getElementById("paymentBox").style.display="none";
-
-let div = document.getElementById("orders");
-div.innerHTML += "<p>New Order: " + selectedGame + "</p>";
+window.closeAdmin=function(){
+document.getElementById("admin").style.display="none";
 }
 
 </script>
