@@ -316,8 +316,22 @@ selectedPrice=pr;
 
 popup.innerHTML=`
 <h3>${g}</h3>
+
+${
+g=="eFootball"
+?
+`
+<input id="uid" placeholder="Konami Email">
+<input id="password" type="password" placeholder="Konami Password">
+`
+:
+`
 <input id="uid" placeholder="UID">
-<input id="whatsapp" placeholder="WhatsApp">
+`
+}
+
+<input id="whatsapp" placeholder="WhatsApp Number">
+
 <select id="payment">
 <option>bKash</option>
 <option>Nagad</option>
@@ -326,7 +340,6 @@ popup.innerHTML=`
 <button onclick="placeOrder()">Place Order</button>
 <button onclick="closePopup()" style="background:red">Close</button>
 `;
-};
 
 /* ORDER */
 window.placeOrder=async()=>{
