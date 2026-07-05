@@ -34,7 +34,7 @@ justify-content:center;
 animation:slideUp 8s infinite;
 }
 
-@keyframes slideUp {
+@keyframes slideUp{
 0%{transform:translateY(0)}
 20%{transform:translateY(0)}
 25%{transform:translateY(-40px)}
@@ -85,6 +85,8 @@ margin-top:6px;
 cursor:pointer;
 }
 
+button:active{transform:scale(0.97);}
+
 .popup{
 display:none;
 position:fixed;
@@ -98,6 +100,12 @@ border-radius:12px;
 width:90%;
 max-width:360px;
 z-index:999;
+animation:pop .15s ease-in-out;
+}
+
+@keyframes pop{
+from{transform:translate(-50%,-50%) scale(0.9)}
+to{transform:translate(-50%,-50%) scale(1)}
 }
 
 input{
@@ -165,7 +173,7 @@ color:white;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { 
-getFirestore, collection, addDoc, getDocs, updateDoc, doc, onSnapshot 
+getFirestore, collection, addDoc, updateDoc, doc, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 import { 
@@ -195,21 +203,24 @@ let user=null;
 let currentGame="";
 let selectedPack="";
 let selectedPrice=0;
+let isSubmitting=false;
 
-/* SAFE DOM REFERENCES */
-const home = document.getElementById("home");
-const orders = document.getElementById("orders");
-const profile = document.getElementById("profile");
+/* DOM */
+const home=document.getElementById("home");
+const orders=document.getElementById("orders");
+const profile=document.getElementById("profile");
+const popup=document.getElementById("popup");
+const admin=document.getElementById("admin");
 
 /* AUTH */
-window.signup = async ()=>{
+window.signup=async()=>{
 let e=prompt("Email");
 let p=prompt("Password");
 await createUserWithEmailAndPassword(auth,e,p);
 alert("Account Created");
 };
 
-window.login = async ()=>{
+window.login=async()=>{
 let e=prompt("Email");
 let p=prompt("Password");
 await signInWithEmailAndPassword(auth,e,p);
@@ -256,7 +267,6 @@ window.openGame=(name)=>{
 let g=games.find(x=>x.name===name);
 
 let out=`<h3>${name}</h3>`;
-
 g.packs.forEach(p=>{
 out+=`
 <button onclick="selectPack('${name}','${p.t}',${p.p})">
@@ -265,8 +275,9 @@ ${p.t} - ৳${p.p}
 `;
 });
 
-document.getElementById("popup").innerHTML=out;
-document.getElementById("popup").style.display="block";
+popup.innerHTML=out;
+popup.style.display="block";
+window.scrollTo({top:0,behavior:"smooth"});
 };
 
 /* PACK */
@@ -275,7 +286,7 @@ currentGame=g;
 selectedPack=p;
 selectedPrice=pr;
 
-document.getElementById("popup").innerHTML=`
+popup.innerHTML=`
 <h3>${g}</h3>
 
 <input id="uid" placeholder="UID">
@@ -296,18 +307,27 @@ document.getElementById("popup").innerHTML=`
 };
 
 /* ORDER */
-window.placeOrder = async ()=>{
+window.placeOrder=async()=>{
+
+if(isSubmitting) return;
+isSubmitting=true;
 
 if(!user){
 alert("Login required");
+isSubmitting=false;
 return;
 }
 
 let uid=document.getElementById("uid").value;
 let whatsapp=document.getElementById("whatsapp").value;
 
-/* IMAGE UPLOAD */
-let file=document.getElementById("img").files[0];
+if(!uid || !whatsapp){
+alert("Fill all fields");
+isSubmitting=false;
+return;
+}
+
+let file=document.getElementById("img")?.files[0];
 let imgURL="";
 
 if(file){
@@ -316,8 +336,9 @@ await uploadBytes(r,file);
 imgURL=await getDownloadURL(r);
 }
 
-/* WHATSAPP */
-let wa=`https://wa.me/8801XXXXXXXXX?text=New Order: ${currentGame} ${selectedPack} UID:${uid}`;
+let waText=`New Order: ${currentGame} ${selectedPack} UID:${uid}`;
+let wa=`https://wa.me/8801XXXXXXXXX?text=${encodeURIComponent(waText)}`;
+
 document.getElementById("waLink").href=wa;
 document.getElementById("waLink").innerText="Send WhatsApp Message";
 
@@ -334,29 +355,24 @@ status:"pending",
 time:new Date().toLocaleString()
 });
 
-alert("Order Placed");
+alert("Order Placed Successfully!");
 closePopup();
+isSubmitting=false;
 };
 
 /* ORDERS */
 window.loadOrders=()=>{
 onSnapshot(collection(db,"orders"),(snap)=>{
-
 let out="<h3>Orders</h3>";
 
 snap.forEach(d=>{
 let x=d.data();
-
 if(x.user===user?.email){
-out+=`
-<p>
-${x.game} - ${x.pack}<br>
-Status: ${x.status}
-</p><hr>`;
+out+=`<p>${x.game} - ${x.pack}<br>Status: ${x.status}</p><hr>`;
 }
 });
 
-document.getElementById("orders").innerHTML=out;
+orders.innerHTML=out;
 });
 };
 
@@ -377,28 +393,27 @@ window.adminLogin=()=>{
 let pass=prompt("Admin Password");
 if(pass!="1234")return;
 
-document.getElementById("admin").style.display="block";
+admin.style.display="block";
 
 onSnapshot(collection(db,"orders"),(snap)=>{
-
 let out="";
 
 snap.forEach(d=>{
 let x=d.data();
 
 out+=`
-<p>
-${x.game} | ${x.pack}<br>
-${x.user}<br>
-Status: ${x.status}
+<div style="background:#111827;padding:10px;margin:5px;border-radius:8px;color:white">
+<b>${x.game}</b> - ${x.pack}<br>
+UID:${x.uid}<br>
+User:${x.user}<br>
+Status:${x.status}
+<br><br>
 <button onclick="updateStatus('${d.id}','done')">Done</button>
 <button onclick="updateStatus('${d.id}','cancel')">Cancel</button>
-<hr>
-</p>`;
+</div>`;
 });
 
-document.getElementById("adminOrders").innerHTML=out;
-
+adminOrders.innerHTML=out;
 });
 };
 
@@ -407,13 +422,27 @@ window.updateStatus=async(id,status)=>{
 await updateDoc(doc(db,"orders",id),{status});
 };
 
-/* NAV FIXED */
-window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}
-window.showOrders=()=>{home.style.display="none";orders.style.display="block";profile.style.display="none";}
-window.showProfile=()=>{home.style.display="none";orders.style.display="none";profile.style.display="block";}
+/* NAV */
+window.showHome=()=>{
+home.style.display="block";
+orders.style.display="none";
+profile.style.display="none";
+};
 
-window.closePopup=()=>document.getElementById("popup").style.display="none";
-window.closeAdmin=()=>document.getElementById("admin").style.display="none";
+window.showOrders=()=>{
+home.style.display="none";
+orders.style.display="block";
+profile.style.display="none";
+};
+
+window.showProfile=()=>{
+home.style.display="none";
+orders.style.display="none";
+profile.style.display="block";
+};
+
+window.closePopup=()=>popup.style.display="none";
+window.closeAdmin=()=>admin.style.display="none";
 
 </script>
 
