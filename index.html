@@ -181,9 +181,13 @@ import {
 getFirestore, collection, addDoc, updateDoc, doc, onSnapshot  
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";  
   
-import {  
-getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged  
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";  
+import {
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
   
 /* FIREBASE */  
 const firebaseConfig = {  
@@ -397,14 +401,73 @@ orders.innerHTML=out;
 });  
 };  
   
-/* PROFILE */  
-window.loadProfile=()=>{  
-if(!user){  
-profile.innerHTML=`<button onclick="login()">Login</button><button onclick="signup()">Signup</button>`;  
-return;  
-}  
-profile.innerHTML=`Logged in: ${user.email}`;  
-};  
+/* PROFILE */
+window.loadProfile=()=>{
+
+if(!user){
+
+profile.innerHTML=`
+<div style="padding:20px;text-align:center">
+
+<h2>Account</h2>
+
+<button
+onclick="login()"
+style="
+width:100%;
+padding:12px;
+margin-bottom:10px;
+background:#22c55e;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+">
+Login
+</button>
+
+<button
+onclick="signup()"
+style="
+width:100%;
+padding:12px;
+background:#2563eb;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+">
+Sign Up
+</button>
+
+</div>
+`;
+return;
+}
+
+profile.innerHTML=`
+<div style="padding:20px">
+
+<h2>Profile</h2>
+
+<p><b>Email:</b> ${user.email}</p>
+
+<button
+onclick="logout()"
+style="
+width:100%;
+padding:12px;
+background:red;
+border:none;
+border-radius:10px;
+color:white;
+">
+Logout
+</button>
+
+</div>
+`;
+};
   
 /* ADMIN */  
 window.adminLogin=()=>{  
