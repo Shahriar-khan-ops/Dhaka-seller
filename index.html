@@ -7,10 +7,7 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-font-family:Arial;
-background:#f1f5f9;
-}
+body{font-family:Arial;background:#f1f5f9}
 
 header{
 background:#111827;
@@ -41,6 +38,7 @@ border:none;
 padding:10px 15px;
 border-radius:8px;
 margin-top:10px;
+cursor:pointer;
 }
 
 .popup{
@@ -64,9 +62,7 @@ padding:10px;
 margin:10px 0;
 }
 
-.close{
-background:red;
-}
+.close{background:red}
 
 .admin{
 position:fixed;
@@ -76,6 +72,7 @@ background:black;
 border-radius:50%;
 width:50px;
 height:50px;
+color:white;
 }
 </style>
 </head>
@@ -117,50 +114,21 @@ height:50px;
 </div>
 
 <!-- ORDER -->
-<div class="popup" id="order">
-<h2 id="title"></h2>
-
-<input id="uid" placeholder="Enter UID">
-
-<p>
-bKash/Nagad:<br>
-01XXXXXXXXX
-</p>
-
-<button onclick="confirmOrder()">
-Confirm Order
-</button>
-
-<button class="close" onclick="closeBox()">
-Close
-</button>
-</div>
+<div class="popup" id="order"></div>
 
 <!-- ADMIN -->
 <div class="popup" id="admin">
 <h2>Admin Orders</h2>
 <div id="orders"></div>
-<button class="close" onclick="closeAdmin()">
-Close
-</button>
+<button class="close" onclick="closeAdmin()">Close</button>
 </div>
 
-<button class="admin" onclick="adminLogin()">
-A
-</button>
+<button class="admin" onclick="adminLogin()">A</button>
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-
-import {
-getFirestore,
-collection,
-addDoc,
-getDocs
-}
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
@@ -171,196 +139,90 @@ messagingSenderId: "332523373651",
 appId: "1:332523373651:web:e912f988d65c829b19f2a6"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-let current="";
+let current = "";
 
-window.buy=function(game){
+window.buy = function(game){
+current = game;
 
-current=game;
+document.getElementById("order").innerHTML = `
+<h2>${game} Order</h2>
 
-let html="";
+<input id="uid" placeholder="Enter UID / Username / Email">
+<input id="whatsapp" placeholder="WhatsApp Number">
 
-if(game=="Free Fire"){
-html=`
-<h2>Free Fire Order</h2>
+<p>bKash/Nagad: 01XXXXXXXXX</p>
 
-<input id="uid" placeholder="Player UID">
-
-<input id="whatsapp"
-placeholder="WhatsApp Number">
-
-<p>
-bKash/Nagad:<br>
-01XXXXXXXXX
-</p>
-
-<button onclick="confirmOrder()">
-Confirm Order
-</button>
-
-<button class="close"
-onclick="closeBox()">
-Close
-</button>
+<button onclick="confirmOrder()">Confirm Order</button>
+<button class="close" onclick="closeBox()">Close</button>
 `;
-}
 
-else if(game=="eFootball"){
-html=`
-<h2>eFootball Order</h2>
-
-<input id="konami"
-placeholder="Konami Gmail">
-
-<input id="whatsapp"
-placeholder="WhatsApp Number">
-
-<p>
-bKash/Nagad:<br>
-01XXXXXXXXX
-</p>
-
-<button onclick="confirmOrder()">
-Confirm Order
-</button>
-
-<button class="close"
-onclick="closeBox()">
-Close
-</button>
-`;
-}
-
-else if(game=="Roblox"){
-html=`
-<h2>Roblox Order</h2>
-
-<input id="username"
-placeholder="Roblox Username">
-
-<input id="whatsapp"
-placeholder="WhatsApp Number">
-
-<p>
-bKash/Nagad:<br>
-01XXXXXXXXX
-</p>
-
-<button onclick="confirmOrder()">
-Confirm Order
-</button>
-
-<button class="close"
-onclick="closeBox()">
-Close
-</button>
-`;
-}
-
-else if(game=="Minecraft"){
-html=`
-<h2>Minecraft Order</h2>
-
-<input id="username"
-placeholder="Minecraft Username">
-
-<input id="whatsapp"
-placeholder="WhatsApp Number">
-
-<p>
-bKash/Nagad:<br>
-01XXXXXXXXX
-</p>
-
-<button onclick="confirmOrder()">
-Confirm Order
-</button>
-
-<button class="close"
-onclick="closeBox()">
-Close
-</button>
-`;
-}
-
-else if(game=="FC Mobile"){
-html=`
-<h2>FC Mobile Order</h2>
-
-<input id="eaemail"
-placeholder="EA Account Email">
-
-<input id="whatsapp"
-placeholder="WhatsApp Number">
-
-<p>
-bKash/Nagad:<br>
-01XXXXXXXXX
-</p>
-
-<button onclick="confirmOrder()">
-Confirm Order
-</button>
-
-<button class="close"
-onclick="closeBox()">
-Close
-</button>
-`;
-}
-
-document.getElementById("order").innerHTML=html;
 document.getElementById("order").style.display="block";
+};
+
+window.confirmOrder = async function(){
+
+let uid = document.getElementById("uid").value;
+let whatsapp = document.getElementById("whatsapp").value;
+
+if(!uid || !whatsapp){
+alert("Fill all fields");
+return;
 }
+
 await addDoc(collection(db,"orders"),{
-game:current,
-uid:uid,
-status:"pending",
-time:new Date().toLocaleString()
+game: current,
+uid: uid,
+whatsapp: whatsapp,
+status: "pending",
+time: new Date().toLocaleString()
 });
 
 alert("Order Submitted!");
-
-document.getElementById("uid").value="";
 closeBox();
+};
+
+function closeBox(){
+document.getElementById("order").style.display="none";
 }
 
-window.adminLogin=async function(){
+window.adminLogin = async function(){
 
-let pass=prompt("Admin Password");
+let pass = prompt("Admin Password");
 
-if(pass!="1234"){
+if(pass != "1234"){
 alert("Wrong Password");
 return;
 }
 
 document.getElementById("admin").style.display="block";
 
-let snap=await getDocs(collection(db,"orders"));
+let snap = await getDocs(collection(db,"orders"));
 
-let html="";
+let html = "";
 
 snap.forEach(doc=>{
-let d=doc.data();
+let d = doc.data();
 
-html+=`
+html += `
 <p>
 🎮 ${d.game}<br>
 UID: ${d.uid}<br>
-Status: ${d.status}<hr>
+WhatsApp: ${d.whatsapp || "-"}<br>
+Status: ${d.status}
+<hr>
 </p>
 `;
 });
 
-document.getElementById("orders").innerHTML=
-html || "No Orders";
-}
+document.getElementById("orders").innerHTML = html || "No Orders";
+};
 
-window.closeAdmin=function(){
+window.closeAdmin = function(){
 document.getElementById("admin").style.display="none";
-}
+};
 
 </script>
 
