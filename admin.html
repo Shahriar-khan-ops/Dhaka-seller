@@ -55,6 +55,41 @@ color:white;
 font-size:16px;
 }
 </style>
+ <script>
+function openProducts(){
+document.getElementById("content").innerHTML=`
+<h2>📦 Product Management</h2>
+
+<button onclick="addProduct()">➕ Add Product</button>
+<button>Edit Product</button>
+<button>Delete Product</button>
+`;
+}
+
+function openOrders(){
+document.getElementById("content").innerHTML=`
+<h2>📋 Orders</h2>
+<p>All customer orders will appear here.</p>
+`;
+}
+
+function openSettings(){
+document.getElementById("content").innerHTML=`
+<h2>⚙️ Settings</h2>
+
+<button>Payment Number</button>
+<button>Banner Settings</button>
+`;
+}
+
+function logoutAdmin(){
+location.href="index.html";
+}
+
+function addProduct(){
+alert("Add Product clicked");
+}
+ </script>
   
 <body>
 <header>
