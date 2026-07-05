@@ -42,7 +42,21 @@ font-size:16px;
 </head>
 <script>
 function addProduct(){
-    alert("Add Product button works!");
+    document.getElementById("productForm").style.display="block";
+}
+
+function saveProduct(){
+
+let game=document.getElementById("gameName").value;
+let product=document.getElementById("productName").value;
+let price=document.getElementById("productPrice").value;
+
+alert(
+"Game: "+game+
+"\nProduct: "+product+
+"\nPrice: "+price
+);
+
 }
 </script>
 <script type="module">
@@ -74,6 +88,17 @@ console.log("Firebase Connected ✅");
 <div class="box">
 <h3>📦 Product Management</h3>
 <button onclick="addProduct()">Add Product</button>
+<div id="productForm" style="display:none;margin-top:15px;">
+
+<input id="gameName" placeholder="Game Name">
+
+<input id="productName" placeholder="Product Name">
+
+<input id="productPrice" type="number" placeholder="Price">
+
+<button onclick="saveProduct()">Save Product</button>
+
+</div>
 <button>Edit Price</button>
 <button>Delete Product</button>
 </div>
