@@ -732,19 +732,33 @@ margin-top:15px;
 `;
 
 onSnapshot(collection(db,"orders"),(snap)=>{
-let total=0;
+
+let total = 0;
+let totalOrders = 0;
 
 snap.forEach(d=>{
-let x=d.data();
 
-if(x.user===user.email){
+let x = d.data();
+
+if(x.user === user.email){
+
+totalOrders++;
+
+if(x.status === "completed"){
 total += Number(x.price || 0);
 }
+
+}
+
 });
 
 document.getElementById("spent").innerText = total;
+
+if(document.getElementById("totalOrders")){
+document.getElementById("totalOrders").innerText = totalOrders;
+}
+
 });
-};
   
 /* ADMIN */  
 window.adminLogin=()=>{  
