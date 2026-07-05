@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TopUp Pro FF Shop</title>
+<title>AMS TopUp Pro</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:white}
@@ -12,12 +12,29 @@ header{
 background:#111827;
 padding:15px;
 text-align:center;
+font-weight:bold;
+}
+
+.nav{
+display:flex;
+justify-content:space-around;
+background:#1e293b;
+padding:10px;
+position:sticky;
+top:0;
+}
+
+.nav button{
+background:none;
+border:none;
+color:white;
+font-weight:bold;
 }
 
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-gap:12px;
+gap:10px;
 padding:15px;
 }
 
@@ -34,7 +51,7 @@ border:none;
 padding:10px;
 border-radius:8px;
 color:white;
-margin-top:8px;
+margin-top:6px;
 cursor:pointer;
 }
 
@@ -74,18 +91,27 @@ color:white;
 
 <body>
 
-<header>
-<h2>FREE FIRE TOPUP PRO</h2>
-<p>Diamond Shop System</p>
-</header>
+<header>AMS TOPUP PRO MAX</header>
 
+<div class="nav">
+<button onclick="showHome()">Home</button>
+<button onclick="showOrders()">Orders</button>
+<button onclick="showProfile()">Profile</button>
+</div>
+
+<div id="home">
 <div class="grid" id="products"></div>
+</div>
+
+<div id="orders" style="display:none;padding:15px"></div>
+
+<div id="profile" style="display:none;padding:15px"></div>
 
 <div class="popup" id="popup"></div>
 
 <div class="popup" id="admin">
-<h3>Admin Panel</h3>
-<div id="orders"></div>
+<h3>Admin Panel (Live)</h3>
+<div id="adminOrders"></div>
 <button onclick="closeAdmin()" style="background:red">Close</button>
 </div>
 
@@ -94,8 +120,19 @@ color:white;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { 
+getFirestore, collection, addDoc, getDocs, updateDoc, doc, onSnapshot 
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+import { 
+getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+import { 
+getStorage, ref, uploadBytes, getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
+
+/* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
 authDomain: "dhaka-seller.firebaseapp.com",
@@ -107,114 +144,143 @@ appId: "1:332523373651:web:e912f988d65c829b19f2a6"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth();
+const storage = getStorage();
 
-let current="";
+let user=null;
+let currentGame="";
 let selectedPack="";
 let selectedPrice=0;
-let userLogged=false;
-let currentUser="";
 
-/* LOGIN SYSTEM */
-window.signup = async function(){
-let email = prompt("Email");
-let pass = prompt("Password");
-
-await addDoc(collection(db,"users"),{
-email, pass
-});
-
+/* AUTH */
+window.signup = async ()=>{
+let e=prompt("Email");
+let p=prompt("Password");
+await createUserWithEmailAndPassword(auth,e,p);
 alert("Account Created");
 };
 
-window.login = async function(){
-let email = prompt("Email");
-let pass = prompt("Password");
-
-userLogged = true;
-currentUser = email;
-
+window.login = async ()=>{
+let e=prompt("Email");
+let p=prompt("Password");
+await signInWithEmailAndPassword(auth,e,p);
 alert("Logged In");
 };
 
-/* FREE FIRE PACKS */
-const ffPacks = [
-{title:"50 Diamonds", price:45},
-{title:"115 Diamonds", price:95},
-{title:"240 Diamonds", price:190},
-{title:"355 Diamonds", price:280},
-{title:"520 Diamonds", price:420},
-{title:"1060 Diamonds", price:820}
-];
+onAuthStateChanged(auth,(u)=>{
+user=u;
+loadProfile();
+loadOrders();
+});
 
 /* PRODUCTS */
-const products = ["Free Fire"];
+const games=[
+{
+name:"Free Fire",
+packs:[
+{t:"50 Diamonds",p:45},
+{t:"115 Diamonds",p:95},
+{t:"520 Diamonds",p:420}
+]
+},
+{
+name:"eFootball",
+packs:[
+{t:"500 Coins",p:120}
+]
+}
+];
 
 let html="";
-products.forEach(p=>{
+games.forEach(g=>{
 html+=`
 <div class="card">
-<h3>${p}</h3>
-<button onclick="openFF()">Buy</button>
+<h3>${g.name}</h3>
+<button onclick="openGame('${g.name}')">Buy</button>
 </div>
 `;
 });
 document.getElementById("products").innerHTML=html;
 
-/* OPEN FF PACKS */
-window.openFF=function(){
+/* GAME */
+window.openGame=(name)=>{
+let g=games.find(x=>x.name===name);
 
-let packHTML="";
-ffPacks.forEach(p=>{
-packHTML+=`
-<button onclick="selectPack('${p.title}',${p.price})">
-${p.title} - ৳${p.price}
+let out=`<h3>${name}</h3>`;
+
+g.packs.forEach(p=>{
+out+=`
+<button onclick="selectPack('${name}','${p.t}',${p.p})">
+${p.t} - ৳${p.p}
 </button><br>
 `;
 });
 
-document.getElementById("popup").innerHTML=`
-<h3>Free Fire Diamonds</h3>
-${packHTML}
-<button onclick="closePopup()" style="background:red">Close</button>
-`;
-
+document.getElementById("popup").innerHTML=out;
 document.getElementById("popup").style.display="block";
 };
 
-/* SELECT PACK */
-window.selectPack=function(pack,price){
-selectedPack=pack;
-selectedPrice=price;
+/* PACK */
+window.selectPack=(g,p,pr)=>{
+currentGame=g;
+selectedPack=p;
+selectedPrice=pr;
 
 document.getElementById("popup").innerHTML=`
-<h3>Order ${pack}</h3>
+<h3>${g}</h3>
 
-<input id="uid" placeholder="Free Fire UID">
+<input id="uid" placeholder="UID">
 <input id="whatsapp" placeholder="WhatsApp">
 
-<button onclick="placeOrder()">Confirm Order</button>
+<select id="payment">
+<option>bKash</option>
+<option>Nagad</option>
+</select>
+
+<input type="file" id="img">
+
+<button onclick="placeOrder()">Place Order</button>
 <button onclick="closePopup()" style="background:red">Close</button>
+
+<a id="waLink" target="_blank"></a>
 `;
 };
 
-/* PLACE ORDER */
-window.placeOrder=async function(){
+/* ORDER */
+window.placeOrder = async ()=>{
 
-if(!userLogged){
-alert("Please login first");
+if(!user){
+alert("Login required");
 return;
 }
 
 let uid=document.getElementById("uid").value;
 let whatsapp=document.getElementById("whatsapp").value;
 
+/* IMAGE UPLOAD */
+let file=document.getElementById("img").files[0];
+let imgURL="";
+
+if(file){
+let r=ref(storage,"payments/"+file.name);
+await uploadBytes(r,file);
+imgURL=await getDownloadURL(r);
+}
+
+/* WHATSAPP LINK */
+let wa=`https://wa.me/8801XXXXXXXXX?text=New Order: ${currentGame} ${selectedPack} UID:${uid}`;
+document.getElementById("waLink").href=wa;
+document.getElementById("waLink").innerText="Send WhatsApp Message";
+
 await addDoc(collection(db,"orders"),{
-user: currentUser,
-game:"Free Fire",
+user:user.email,
+game:currentGame,
 pack:selectedPack,
 price:selectedPrice,
 uid,
 whatsapp,
+payment:document.getElementById("payment").value,
+img:imgURL,
 status:"pending",
 time:new Date().toLocaleString()
 });
@@ -223,46 +289,74 @@ alert("Order Placed");
 closePopup();
 };
 
-/* ADMIN UPDATE STATUS */
-window.updateStatus=async function(id,status){
-await updateDoc(doc(db,"orders",id),{
-status
-});
-alert("Updated");
-};
+/* ORDERS */
+window.loadOrders=()=>{
+onSnapshot(collection(db,"orders"),(snap)=>{
 
-/* ADMIN LOGIN */
-window.adminLogin=async function(){
-let pass=prompt("Admin Password");
-if(pass!="1234"){alert("Wrong");return;}
+let out="<h3>Orders</h3>";
 
-document.getElementById("admin").style.display="block";
-
-let snap=await getDocs(collection(db,"orders"));
-
-let out="";
 snap.forEach(d=>{
-let data=d.data();
+let x=d.data();
 
+if(x.user===user?.email){
 out+=`
 <p>
-${data.game} | ${data.pack}<br>
-${data.uid}<br>
-Status: ${data.status}<br>
-<button onclick="updateStatus('${d.id}','done')">Done</button>
-<hr>
-</p>
-`;
+${x.game} - ${x.pack}<br>
+Status:${x.status}
+</p><hr>`;
+}
 });
 
 document.getElementById("orders").innerHTML=out;
+});
 };
 
-/* CLOSE */
-window.closePopup=()=>document.getElementById("popup").style.display="none";
-window.closeAdmin=()=>document.getElementById("admin").style.display="none";
+/* PROFILE */
+window.loadProfile=()=>{
+if(!user){
+profile.innerHTML=`<button onclick="login()">Login</button>
+<button onclick="signup()">Signup</button>`;
+return;
+}
 
-</script>
+profile.innerHTML=`Logged in: ${user.email}`;
+};
 
-</body>
-</html>
+/* ADMIN LIVE */
+window.adminLogin=()=>{
+let pass=prompt("Admin Password");
+if(pass!="1234")return;
+
+document.getElementById("admin").style.display="block";
+
+onSnapshot(collection(db,"orders"),(snap)=>{
+
+let out="";
+
+snap.forEach(d=>{
+let x=d.data();
+
+out+=`
+<p>
+${x.game} | ${x.pack}<br>
+${x.user}<br>
+Status:${x.status}
+<button onclick="updateStatus('${d.id}','done')">Done</button>
+<button onclick="updateStatus('${d.id}','cancel')">Cancel</button>
+<hr>
+</p>`;
+});
+
+document.getElementById("adminOrders").innerHTML=out;
+
+});
+};
+
+/* STATUS */
+window.updateStatus=async(id,status)=>{
+await updateDoc(doc(db,"orders",id),{status});
+};
+
+/* NAV */
+window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}
+window.showOrders
