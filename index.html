@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZISAN TOPUP PRO MAX</title>
+<title>AMS TOPUP PRO FIXED</title>
 
 <style>
 body{
@@ -13,7 +13,6 @@ background:linear-gradient(135deg,#0b1220,#0f172a);
 color:white;
 }
 
-/* HEADER */
 header{
 background:linear-gradient(135deg,#111827,#1e293b);
 padding:18px;
@@ -21,17 +20,9 @@ text-align:center;
 border-bottom:2px solid #22c55e;
 }
 
-.logo{
-font-size:20px;
-font-weight:bold;
-}
+.logo{font-size:20px;font-weight:bold;}
+.tag{font-size:12px;opacity:0.7;}
 
-.tag{
-font-size:12px;
-opacity:0.7;
-}
-
-/* BANNER */
 .v-banner{
 height:40px;
 overflow:hidden;
@@ -61,7 +52,6 @@ animation:slideUp 8s infinite;
 100%{transform:translateY(0)}
 }
 
-/* NAV */
 .nav{
 display:flex;
 justify-content:space-around;
@@ -78,7 +68,6 @@ color:white;
 font-weight:bold;
 }
 
-/* GRID */
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
@@ -86,19 +75,15 @@ gap:12px;
 padding:15px;
 }
 
-/* CARD */
 .card{
 background:#1e293b;
 padding:15px;
 border-radius:15px;
 text-align:center;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
 transition:0.2s;
 }
 
-.card:hover{
-transform:translateY(-5px);
-}
+.card:hover{transform:translateY(-4px);}
 
 .card button{
 width:100%;
@@ -106,12 +91,10 @@ background:linear-gradient(135deg,#22c55e,#16a34a);
 border:none;
 padding:10px;
 border-radius:10px;
-font-weight:bold;
 color:white;
 cursor:pointer;
 }
 
-/* POPUP */
 .popup{
 display:none;
 position:fixed;
@@ -125,18 +108,14 @@ border-radius:12px;
 width:90%;
 max-width:360px;
 z-index:999;
-box-shadow:0 20px 50px rgba(0,0,0,0.4);
 }
 
 input,select{
 width:100%;
 padding:10px;
 margin:6px 0;
-border-radius:8px;
-border:1px solid #ccc;
 }
 
-/* ADMIN */
 .adminBtn{
 position:fixed;
 bottom:15px;
@@ -153,42 +132,34 @@ border:none;
 
 <body>
 
-<!-- HEADER -->
 <header>
-<div class="logo">🎮 AMS TOPUP PRO MAX</div>
-<div class="tag">Instant Game Top-Up System</div>
+<div class="logo">🎮 AMS TOPUP PRO FIXED</div>
+<div class="tag">Instant Game Top-Up</div>
 </header>
 
-<!-- BANNER -->
 <div class="v-banner">
-  <div class="v-item">🔥 Free Fire Diamond Sale</div>
-  <div class="v-item">⚡ Instant Delivery 1-5 Min</div>
-  <div class="v-item">💰 bKash / Nagad Payment</div>
-  <div class="v-item">🎮 All Games Available</div>
+<div class="v-item">🔥 Free Fire Diamond Sale</div>
+<div class="v-item">⚡ Instant Delivery 1-5 Min</div>
+<div class="v-item">💰 bKash / Nagad</div>
+<div class="v-item">🎮 All Games</div>
 </div>
 
-<!-- NAV -->
 <div class="nav">
 <button onclick="showHome()">Home</button>
 <button onclick="showOrders()">Orders</button>
 <button onclick="showProfile()">Profile</button>
 </div>
 
-<!-- HOME -->
 <div id="home">
 <div class="grid" id="products"></div>
 </div>
 
-<!-- ORDERS -->
 <div id="orders" style="display:none;padding:15px"></div>
 
-<!-- PROFILE -->
 <div id="profile" style="display:none;padding:15px"></div>
 
-<!-- POPUP -->
 <div class="popup" id="popup"></div>
 
-<!-- ADMIN -->
 <div class="popup" id="admin">
 <h3>Admin Panel</h3>
 <div id="adminOrders"></div>
@@ -233,12 +204,12 @@ let selectedPack="";
 let selectedPrice=0;
 let isSubmitting=false;
 
-/* DOM */
 const home=document.getElementById("home");
 const orders=document.getElementById("orders");
 const profile=document.getElementById("profile");
 const popup=document.getElementById("popup");
 const admin=document.getElementById("admin");
+const adminOrders=document.getElementById("adminOrders");
 
 /* AUTH */
 window.signup=async()=>{
@@ -263,26 +234,8 @@ loadOrders();
 
 /* PRODUCTS */
 const games=[
-{
-name:"Free Fire",
-packs:[
-{t:"50 Diamonds",p:45},
-{t:"115 Diamonds",p:95},
-{t:"520 Diamonds",p:420}
-]
-},
-{
-name:"eFootball",
-packs:[
-{t:"500 Coins",p:120}
-]
-},
-{
-name:"Roblox",
-packs:[
-{t:"Robux Pack 1",p:150}
-]
-}
+{ name:"Free Fire", packs:[{t:"50 Diamonds",p:45},{t:"115 Diamonds",p:95}] },
+{ name:"eFootball", packs:[{t:"500 Coins",p:120}] }
 ];
 
 let html="";
@@ -290,9 +243,8 @@ games.forEach(g=>{
 html+=`
 <div class="card">
 <h3>${g.name}</h3>
-<button onclick="openGame('${g.name}')">Buy Now</button>
-</div>
-`;
+<button onclick="openGame('${g.name}')">Buy</button>
+</div>`;
 });
 document.getElementById("products").innerHTML=html;
 
@@ -305,8 +257,7 @@ g.packs.forEach(p=>{
 out+=`
 <button onclick="selectPack('${name}','${p.t}',${p.p})">
 ${p.t} - ৳${p.p}
-</button>
-`;
+</button>`;
 });
 
 popup.innerHTML=out;
@@ -321,15 +272,12 @@ selectedPrice=pr;
 
 popup.innerHTML=`
 <h3>${g}</h3>
-
-<input id="uid" placeholder="Game UID">
+<input id="uid" placeholder="UID">
 <input id="whatsapp" placeholder="WhatsApp">
-
 <select id="payment">
 <option>bKash</option>
 <option>Nagad</option>
 </select>
-
 <input type="file" id="img">
 
 <button onclick="placeOrder()">Place Order</button>
@@ -339,11 +287,13 @@ popup.innerHTML=`
 `;
 };
 
-/* ORDER */
+/* ORDER FIXED */
 window.placeOrder=async()=>{
 
 if(isSubmitting) return;
 isSubmitting=true;
+
+try{
 
 if(!user){
 alert("Login required");
@@ -373,7 +323,7 @@ let waText=`New Order: ${currentGame} ${selectedPack} UID:${uid}`;
 let wa=`https://wa.me/8801XXXXXXXXX?text=${encodeURIComponent(waText)}`;
 
 document.getElementById("waLink").href=wa;
-document.getElementById("waLink").innerText="Send WhatsApp Message";
+document.getElementById("waLink").innerText="Send WhatsApp";
 
 await addDoc(collection(db,"orders"),{
 user:user.email,
@@ -388,9 +338,16 @@ status:"pending",
 time:new Date().toLocaleString()
 });
 
-alert("Order Placed Successfully!");
+alert("Order Placed");
 closePopup();
+
+}catch(e){
+alert("Error placing order");
+console.log(e);
+
+}finally{
 isSubmitting=false;
+}
 };
 
 /* ORDERS */
@@ -412,12 +369,9 @@ orders.innerHTML=out;
 /* PROFILE */
 window.loadProfile=()=>{
 if(!user){
-profile.innerHTML=`
-<button onclick="login()">Login</button>
-<button onclick="signup()">Signup</button>`;
+profile.innerHTML=`<button onclick="login()">Login</button><button onclick="signup()">Signup</button>`;
 return;
 }
-
 profile.innerHTML=`Logged in: ${user.email}`;
 };
 
@@ -435,11 +389,11 @@ snap.forEach(d=>{
 let x=d.data();
 
 out+=`
-<div style="background:#111827;padding:10px;margin:5px;border-radius:8px;color:white">
-<b>${x.game}</b> - ${x.pack}<br>
-User: ${x.user}<br>
-Status: ${x.status}
-<br><br>
+<div style="background:#111827;padding:10px;margin:5px;border-radius:8px">
+<b>${x.game}</b><br>
+${x.user}<br>
+${x.status}
+<br>
 <button onclick="updateStatus('${d.id}','done')">Done</button>
 <button onclick="updateStatus('${d.id}','cancel')">Cancel</button>
 </div>`;
