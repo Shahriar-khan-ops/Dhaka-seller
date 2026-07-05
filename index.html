@@ -137,6 +137,25 @@ border:none;
 }  
 </style>  
 </head>  
+<script>
+function syncProducts(){
+let products = JSON.parse(localStorage.getItem("products")) || [];
+
+/* এখানে তোমার existing HTML container ধরবে */
+document.querySelectorAll("[data-product]").forEach((card, index) => {
+if(products[index]){
+card.style.display = "block";
+card.querySelector(".name").innerText = products[index].name;
+card.querySelector(".price").innerText = products[index].price;
+}
+});
+}
+
+syncProducts();
+
+
+window.addEventListener("storage", syncProducts);
+</script>
   
 <body>  
   
