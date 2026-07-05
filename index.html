@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TopUp Shop Pro</title>
+<title>TopUp Pro FF Shop</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0f172a;color:white}
+body{margin:0;font-family:Arial;background:#0b1220;color:white}
 
 header{
 background:#111827;
-padding:20px;
+padding:15px;
 text-align:center;
 }
 
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-gap:15px;
-padding:20px;
+gap:12px;
+padding:15px;
 }
 
 .card{
 background:#1e293b;
-padding:20px;
+padding:15px;
 border-radius:12px;
 text-align:center;
 }
@@ -34,8 +34,8 @@ border:none;
 padding:10px;
 border-radius:8px;
 color:white;
+margin-top:8px;
 cursor:pointer;
-margin-top:10px;
 }
 
 .popup{
@@ -46,7 +46,7 @@ left:50%;
 transform:translate(-50%,-50%);
 background:white;
 color:black;
-padding:20px;
+padding:15px;
 border-radius:12px;
 width:90%;
 max-width:360px;
@@ -56,19 +56,18 @@ z-index:999;
 input{
 width:100%;
 padding:10px;
-margin:8px 0;
+margin:6px 0;
 }
 
 .adminBtn{
 position:fixed;
-bottom:20px;
-right:20px;
+bottom:15px;
+right:15px;
 width:50px;
 height:50px;
 border-radius:50%;
 background:black;
 color:white;
-border:none;
 }
 </style>
 </head>
@@ -76,8 +75,8 @@ border:none;
 <body>
 
 <header>
-<h2>TOPUP SHOP PRO</h2>
-<p>Instant Games Top-Up System</p>
+<h2>FREE FIRE TOPUP PRO</h2>
+<p>Diamond Shop System</p>
 </header>
 
 <div class="grid" id="products"></div>
@@ -95,7 +94,7 @@ border:none;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",
@@ -109,137 +108,159 @@ appId: "1:332523373651:web:e912f988d65c829b19f2a6"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let current = "";
-let isSubmitting = false;
+let current="";
+let selectedPack="";
+let selectedPrice=0;
+let userLogged=false;
+let currentUser="";
 
-/* PRODUCTS */
-const products = [
-"Free Fire",
-"eFootball",
-"Roblox",
-"Minecraft",
-"FC Mobile",
-"PUBG UC",
-"Valorant Points"
+/* LOGIN SYSTEM */
+window.signup = async function(){
+let email = prompt("Email");
+let pass = prompt("Password");
+
+await addDoc(collection(db,"users"),{
+email, pass
+});
+
+alert("Account Created");
+};
+
+window.login = async function(){
+let email = prompt("Email");
+let pass = prompt("Password");
+
+userLogged = true;
+currentUser = email;
+
+alert("Logged In");
+};
+
+/* FREE FIRE PACKS */
+const ffPacks = [
+{title:"50 Diamonds", price:45},
+{title:"115 Diamonds", price:95},
+{title:"240 Diamonds", price:190},
+{title:"355 Diamonds", price:280},
+{title:"520 Diamonds", price:420},
+{title:"1060 Diamonds", price:820}
 ];
 
-let html = "";
+/* PRODUCTS */
+const products = ["Free Fire"];
+
+let html="";
 products.forEach(p=>{
-html += `
+html+=`
 <div class="card">
 <h3>${p}</h3>
-<button onclick="openBuy('${p}')">Buy</button>
+<button onclick="openFF()">Buy</button>
 </div>
 `;
 });
-document.getElementById("products").innerHTML = html;
+document.getElementById("products").innerHTML=html;
 
-/* BUY */
-window.openBuy = function(game){
-current = game;
+/* OPEN FF PACKS */
+window.openFF=function(){
 
-document.getElementById("popup").innerHTML = `
-<h3>${game} Top-Up</h3>
+let packHTML="";
+ffPacks.forEach(p=>{
+packHTML+=`
+<button onclick="selectPack('${p.title}',${p.price})">
+${p.title} - ৳${p.price}
+</button><br>
+`;
+});
 
-<input id="uid" placeholder="Enter ID / Email">
-<input id="whatsapp" placeholder="WhatsApp Number">
-
-<p>Payment: bKash / Nagad</p>
-
-<button onclick="submitOrder()">Confirm Order</button>
+document.getElementById("popup").innerHTML=`
+<h3>Free Fire Diamonds</h3>
+${packHTML}
 <button onclick="closePopup()" style="background:red">Close</button>
 `;
 
 document.getElementById("popup").style.display="block";
 };
 
-/* SUBMIT ORDER */
-window.submitOrder = async function(){
+/* SELECT PACK */
+window.selectPack=function(pack,price){
+selectedPack=pack;
+selectedPrice=price;
 
-let uid = document.getElementById("uid").value;
-let whatsapp = document.getElementById("whatsapp").value;
+document.getElementById("popup").innerHTML=`
+<h3>Order ${pack}</h3>
 
-if(!uid || !whatsapp){
-alert("Fill all fields");
+<input id="uid" placeholder="Free Fire UID">
+<input id="whatsapp" placeholder="WhatsApp">
+
+<button onclick="placeOrder()">Confirm Order</button>
+<button onclick="closePopup()" style="background:red">Close</button>
+`;
+};
+
+/* PLACE ORDER */
+window.placeOrder=async function(){
+
+if(!userLogged){
+alert("Please login first");
 return;
 }
 
-/* 🔥 FIREBASE ORDER HERE (THIS IS THE RIGHT PLACE) */
+let uid=document.getElementById("uid").value;
+let whatsapp=document.getElementById("whatsapp").value;
+
 await addDoc(collection(db,"orders"),{
-game: current,
-pack: selectedPack,
-price: selectedPrice,
-uid: uid,
-whatsapp: whatsapp,
-status: "pending",
-time: new Date().toLocaleString()
+user: currentUser,
+game:"Free Fire",
+pack:selectedPack,
+price:selectedPrice,
+uid,
+whatsapp,
+status:"pending",
+time:new Date().toLocaleString()
 });
 
-alert("Order Placed!");
+alert("Order Placed");
 closePopup();
 };
 
-try{
-await addDoc(collection(db,"orders"),{
-game: current,
-uid: uid,
-whatsapp: whatsapp,
-status: "pending",
-time: new Date().toLocaleString()
+/* ADMIN UPDATE STATUS */
+window.updateStatus=async function(id,status){
+await updateDoc(doc(db,"orders",id),{
+status
 });
-
-alert("Order Placed!");
-closePopup();
-
-}catch(e){
-alert("Error!");
-}
-
-isSubmitting = false;
-};
-
-/* CLOSE POPUP */
-window.closePopup = function(){
-document.getElementById("popup").style.display="none";
+alert("Updated");
 };
 
 /* ADMIN LOGIN */
-window.adminLogin = async function(){
-
-let pass = prompt("Admin Password");
-
-if(pass !== "1234"){
-alert("Wrong Password");
-return;
-}
+window.adminLogin=async function(){
+let pass=prompt("Admin Password");
+if(pass!="1234"){alert("Wrong");return;}
 
 document.getElementById("admin").style.display="block";
 
-let snap = await getDocs(collection(db,"orders"));
+let snap=await getDocs(collection(db,"orders"));
 
-let out = "";
+let out="";
+snap.forEach(d=>{
+let data=d.data();
 
-snap.forEach(doc=>{
-let d = doc.data();
-
-out += `
+out+=`
 <p>
-🎮 ${d.game}<br>
-ID: ${d.uid}<br>
-WhatsApp: ${d.whatsapp}<br>
-Status: ${d.status}
+${data.game} | ${data.pack}<br>
+${data.uid}<br>
+Status: ${data.status}<br>
+<button onclick="updateStatus('${d.id}','done')">Done</button>
 <hr>
 </p>
 `;
 });
 
-document.getElementById("orders").innerHTML = out || "No Orders";
+document.getElementById("orders").innerHTML=out;
 };
 
-/* CLOSE ADMIN */
-window.closeAdmin = function(){
-document.getElementById("admin").style.display="none";
-};
+/* CLOSE */
+window.closePopup=()=>document.getElementById("popup").style.display="none";
+window.closeAdmin=()=>document.getElementById("admin").style.display="none";
 
 </script>
 
