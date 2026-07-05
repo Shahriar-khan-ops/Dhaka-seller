@@ -763,26 +763,45 @@ document.getElementById("totalOrders").innerText = totalOrders;
 }; 
   
 /* ADMIN */  
-window.adminLogin=()=>{  
-let pass=prompt("Admin Password");  
-if(pass!="1234")return;  
-  
-admin.style.display="block";  
-  
-onSnapshot(collection(db,"orders"),(snap)=>{  
-let out="";  
-snap.forEach(d=>{  
-let x=d.data();  
-out+=`  
-<p>  
-${x.game}<br>  
-${x.user}<br>  
-${x.status}  
-</p>`;  
-});  
-adminOrders.innerHTML=out;  
-});  
-};  
+window.adminLogin = () => {
+  const pass = prompt("Admin Password");
+  if (pass !== "1234") return;
+
+  const admin = document.getElementById("admin");
+  const adminOrders = document.getElementById("adminOrders");
+
+  admin.style.display = "block";
+
+  onSnapshot(collection(db, "orders"), (snap) => {
+    let out = "";
+
+    snap.forEach((d) => {
+      const x = d.data() || {};
+
+      out += `
+        <p>
+          ${x.game || ""}<br>
+          ${x.user || ""}<br>
+          ${x.status || ""}
+        </p>
+      `;
+    });
+
+    adminOrders.innerHTML = out;
+  });
+};
+
+/* logout OUTSIDE */
+window.logout = async () => {
+  try {
+    await signOut(auth);
+    alert("Logged Out");
+    showHome();
+  } catch (err) {
+    alert(err.message);
+    console.log(err);
+  }
+};
   
 /* NAV */  
 window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}  
