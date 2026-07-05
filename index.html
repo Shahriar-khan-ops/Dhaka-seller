@@ -182,40 +182,136 @@ current=game;
 
 let html="";
 
-if(game=="Roblox"){
+if(game=="Free Fire"){
 html=`
-<h2>Roblox Order</h2>
-<input id="username" placeholder="Username">
-<input id="password" type="password" placeholder="Password">
-<input id="whatsapp" placeholder="WhatsApp Number">
+<h2>Free Fire Order</h2>
+
+<input id="uid" placeholder="Player UID">
+
+<input id="whatsapp"
+placeholder="WhatsApp Number">
+
+<p>
+bKash/Nagad:<br>
+01XXXXXXXXX
+</p>
+
+<button onclick="confirmOrder()">
+Confirm Order
+</button>
+
+<button class="close"
+onclick="closeBox()">
+Close
+</button>
 `;
 }
 
 else if(game=="eFootball"){
 html=`
 <h2>eFootball Order</h2>
-<input id="gmail" placeholder="Konami Gmail">
-<input id="gmailpass" type="password" placeholder="Gmail Password">
-<input id="whatsapp" placeholder="WhatsApp Number">
+
+<input id="konami"
+placeholder="Konami Gmail">
+
+<input id="whatsapp"
+placeholder="WhatsApp Number">
+
+<p>
+bKash/Nagad:<br>
+01XXXXXXXXX
+</p>
+
+<button onclick="confirmOrder()">
+Confirm Order
+</button>
+
+<button class="close"
+onclick="closeBox()">
+Close
+</button>
 `;
 }
 
-else if(game=="Free Fire"){
+else if(game=="Roblox"){
 html=`
-<h2>Free Fire Order</h2>
-<input id="uid" placeholder="Player UID">
-<input id="server" placeholder="Server">
-<input id="whatsapp" placeholder="WhatsApp Number">
+<h2>Roblox Order</h2>
+
+<input id="username"
+placeholder="Roblox Username">
+
+<input id="whatsapp"
+placeholder="WhatsApp Number">
+
+<p>
+bKash/Nagad:<br>
+01XXXXXXXXX
+</p>
+
+<button onclick="confirmOrder()">
+Confirm Order
+</button>
+
+<button class="close"
+onclick="closeBox()">
+Close
+</button>
 `;
 }
 
-document.getElementById("order").innerHTML =
-html +
-`
-<p>bKash/Nagad: 01XXXXXXXXX</p>
-<button onclick="confirmOrder()">Confirm Order</button>
-`;
+else if(game=="Minecraft"){
+html=`
+<h2>Minecraft Order</h2>
 
+<input id="username"
+placeholder="Minecraft Username">
+
+<input id="whatsapp"
+placeholder="WhatsApp Number">
+
+<p>
+bKash/Nagad:<br>
+01XXXXXXXXX
+</p>
+
+<button onclick="confirmOrder()">
+Confirm Order
+</button>
+
+<button class="close"
+onclick="closeBox()">
+Close
+</button>
+`;
+}
+
+else if(game=="FC Mobile"){
+html=`
+<h2>FC Mobile Order</h2>
+
+<input id="eaemail"
+placeholder="EA Account Email">
+
+<input id="whatsapp"
+placeholder="WhatsApp Number">
+
+<p>
+bKash/Nagad:<br>
+01XXXXXXXXX
+</p>
+
+<button onclick="confirmOrder()">
+Confirm Order
+</button>
+
+<button class="close"
+onclick="closeBox()">
+Close
+</button>
+`;
+}
+
+document.getElementById("order").innerHTML=html;
 document.getElementById("order").style.display="block";
 }
 await addDoc(collection(db,"orders"),{
