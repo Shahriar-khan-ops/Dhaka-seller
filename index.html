@@ -1,83 +1,822 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Free Fire Guild</title>
-
-<style>
-body{
-margin:0;
-font-family:Arial;
-background:#0f172a;
-color:white;
-text-align:center;
-}
-
-header{
-background:#111827;
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>ZISAN TOPUP</title>  
+  
+<style>  
+body{  
+margin:0;  
+font-family:Arial;  
+background:linear-gradient(135deg,#0b1220,#0f172a);  
+color:white;  
+}  
+  
+header{  
+background:linear-gradient(135deg,#111827,#1e293b);  
+padding:18px;  
+text-align:center;  
+border-bottom:2px solid #22c55e;  
+}  
+  
+.logo{font-size:20px;font-weight:bold;}  
+.tag{font-size:12px;opacity:0.7;}  
+  
+/* LOGO STYLE */  
+.game-logo{  
+width:60px;  
+height:60px;  
+object-fit:cover;  
+border-radius:12px;  
+margin-bottom:8px;  
+}  
+  
+.v-banner{  
+height:40px;  
+overflow:hidden;  
+background:#22c55e;  
+color:black;  
+font-weight:bold;  
+display:flex;  
+align-items:center;  
+}  
+  
+.v-item{  
+height:40px;  
+display:flex;  
+align-items:center;  
+justify-content:center;  
+animation:slideUp 8s infinite;  
+}  
+  
+@keyframes slideUp{  
+0%{transform:translateY(0)}  
+20%{transform:translateY(0)}  
+25%{transform:translateY(-40px)}  
+45%{transform:translateY(-40px)}  
+50%{transform:translateY(-80px)}  
+70%{transform:translateY(-80px)}  
+75%{transform:translateY(-120px)}  
+100%{transform:translateY(0)}  
+}  
+  
+.nav{  
+display:flex;  
+justify-content:space-around;  
+background:#1e293b;  
+padding:10px;  
+position:sticky;  
+top:0;  
+}  
+  
+.nav button{  
+background:none;  
+border:none;  
+color:white;  
+font-weight:bold;  
+}  
+  
+.grid{  
+display:grid;  
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));  
+gap:12px;  
+padding:15px;  
+}  
+  
+.card{  
+background:#1e293b;  
+padding:15px;  
+border-radius:15px;  
+text-align:center;  
+}  
+  
+.card button{  
+width:100%;  
+background:linear-gradient(135deg,#22c55e,#16a34a);  
+border:none;  
+padding:10px;  
+border-radius:10px;  
+color:white;  
+cursor:pointer;  
+}  
+  
+.popup{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+color:black;
 padding:15px;
+border-radius:12px;
+width:90%;
+max-width:360px;
+max-height:80vh; 
+overflow-y:auto; 
+z-index:999;
 }
-
-.container{
-padding:20px;
-}
-
-.card{
-background:#1e293b;
-padding:15px;
-margin:10px;
-border-radius:10px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h2>🔥 My Guild Panel</h2>
-</header>
-
-<div class="container">
-
-<div class="card">
-<h2 id="guildName">Guild Name</h2>
-<p>Leader: <span id="leader"></span></p>
-<p>Level: <span id="level"></span></p>
-</div>
-
-<h3>👥 Members</h3>
-<div id="members"></div>
-
-</div>
-
-<script>
-let guild = JSON.parse(localStorage.getItem("guild")) || {
-name: "Zisan Guild",
-leader: "Zisan",
-level: 5,
-members: []
+  
+input,select{  
+width:100%;  
+padding:10px;  
+margin:6px 0;  
+}  
+  
+.adminBtn{  
+position:fixed;  
+bottom:15px;  
+right:15px;  
+width:50px;  
+height:50px;  
+border-radius:50%;  
+background:black;  
+color:white;  
+border:none;  
+}  
+</style>  
+</head>  
+  
+<body>  
+  
+<header>  
+<div class="logo">🎮 ZISAN TOPUP SHOP</div>  
+<div class="tag">Instant Game Top-Up</div>  
+</header>  
+  
+<div class="v-banner">  
+<div class="v-item">🔥 Free Fire Diamond Sale</div>  
+<div class="v-item">⚡ Instant Delivery 1-5 Min</div>  
+<div class="v-item">💰 bKash / Nagad</div>  
+<div class="v-item">🎮 All Games</div>  
+</div>  
+  
+<div class="nav">  
+<button onclick="showHome()">Home</button>  
+<button onclick="showOrders()">Orders</button>  
+<button onclick="showProfile()">Profile</button>  
+</div>  
+  
+<div id="home">  
+<div class="grid" id="products"></div>  
+</div>  
+  
+<div id="orders" style="display:none;padding:15px"></div>  
+  
+<div id="profile" style="display:none;padding:15px"></div>  
+  
+<div class="popup" id="popup"></div>  
+  
+<div class="popup" id="admin">  
+<h3>Admin Panel</h3>  
+<div id="adminOrders"></div>  
+<button onclick="closeAdmin()" style="background:red">Close</button>  
+</div>  
+  
+<button class="adminBtn" onclick="adminLogin()">A</button>  
+  
+<script type="module">  
+  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";  
+import {  
+getFirestore, collection, addDoc, updateDoc, doc, onSnapshot  
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";  
+  
+import {
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  
+/* FIREBASE */  
+const firebaseConfig = {  
+apiKey: "AIzaSyBMxZzmmygEHfeTP2xuFnJ98N5jmj7YYhs",  
+authDomain: "dhaka-seller.firebaseapp.com",  
+projectId: "dhaka-seller",  
+storageBucket: "dhaka-seller.firebasestorage.app",  
+messagingSenderId: "332523373651",  
+appId: "1:332523373651:web:e912f988d65c829b19f2a6"  
+};  
+  
+const app = initializeApp(firebaseConfig);  
+const db = getFirestore(app);  
+const auth = getAuth();  
+  
+let user=null;  
+let currentGame="";  
+let selectedPack="";  
+let selectedPrice=0;  
+  
+const home=document.getElementById("home");  
+const orders=document.getElementById("orders");  
+const profile=document.getElementById("profile");  
+const popup=document.getElementById("popup");  
+const admin=document.getElementById("admin");  
+const adminOrders=document.getElementById("adminOrders");  
+  
+/* AUTH */  
+window.signup = async () => {
+  try{
+    let e = prompt("Email");
+    let p = prompt("Password");
+    await createUserWithEmailAndPassword(auth, e, p);
+    alert("Account Created Successfully");
+  }catch(err){
+    alert(err.message);
+    console.log(err);
+  }
 };
 
-document.getElementById("guildName").innerText = guild.name;
-document.getElementById("leader").innerText = guild.leader;
-document.getElementById("level").innerText = guild.level;
+window.login = async () => {
+  try{
+    let e = prompt("Email");
+    let p = prompt("Password");
+    await signInWithEmailAndPassword(auth, e, p);
+    alert("Login Successful");
+  }catch(err){
+    alert(err.message);
+    console.log(err);
+  }
+};
+  
+onAuthStateChanged(auth,(u)=>{  
+user=u;  
+loadProfile();  
+loadOrders();  
+});  
+  
+/* GAMES WITH LOGO */  
+const games=[  
+  
+{
+name:"Free Fire",
+logo:"ff.png",
+packs:[
+{t:"💎 25 Diamonds",p:25},
+{t:"💎 50 Diamonds",p:45},
+{t:"💎 115 Diamonds",p:95},
+{t:"💎 240 Diamonds",p:190},
+{t:"💎 355 Diamonds",p:280},
+{t:"💎 480 Diamonds",p:380},
+{t:"💎 505 Diamonds",p:400},
+{t:"💎 610 Diamonds",p:480},
+{t:"💎 725 Diamonds",p:570},
+{t:"💎 850 Diamonds",p:670},
+{t:"🔥 💎 1060 Diamonds",p:840},
+{t:"💎 1240 Diamonds",p:980},
+{t:"💎 1450 Diamonds",p:1140},
+{t:"💎 2180 Diamonds",p:1690},
+{t:"💎 2530 Diamonds",p:1960},
+{t:"💎 3560 Diamonds",p:2750},
+{t:"⭐ Weekly Membership",p:160},
+{t:"⭐ Monthly Membership",p:780},
+{t:"🎫 Level Up Pass",p:180},
+{t:"🔥 Weekly Lite",p:80},
+{t:"👑 Booyah Pass",p:450}
+]
+},
+  
+{  
+name:"eFootball",  
+logo:"football.png",  
+packs:[  
+{t:"130 Coins",p:40},  
+{t:"550 Coins",p:120},  
+{t:"1040 Coins",p:220}  
+]  
+},  
+  
+{  
+name:"Roblox",  
+logo:"roblox.png",  
+packs:[  
+{t:"80 Robux",p:120},  
+{t:"400 Robux",p:520},  
+{t:"800 Robux",p:990},  
+{t:"1700 Robux",p:1990},  
+{t:"4500 Robux",p:4990}  
+]  
+},  
+  
+{  
+name:"Minecraft",  
+logo:"minecraft.png",  
+packs:[  
+{t:"330 Minecoins",p:120},  
+{t:"1020 Minecoins",p:320},  
+{t:"1720 Minecoins",p:520},  
+{t:"3500 Minecoins",p:990}  
+]  
+}  
+  
+];  
+/* PRODUCTS */  
+let html="";  
+games.forEach(g=>{  
+html+=`  
+<div class="card">  
+<img src="${g.logo}" class="game-logo">  
+<h3>${g.name}</h3>  
+<button onclick="openGame('${g.name}')">Buy</button>  
+</div>`;  
+});  
+document.getElementById("products").innerHTML=html;  
+  
+/* GAME */
+window.openGame=(name)=>{
 
-function loadMembers(){
-let html = "";
+let g=games.find(x=>x.name===name);
 
-if(guild.members.length === 0){
-html = "<p>No members yet</p>";
-} else {
-guild.members.forEach(m => {
-html += `<div class="card">${m}</div>`;
+let out=`
+<h2 style="
+text-align:center;
+margin-bottom:15px;
+color:#22c55e;
+">
+${name}
+</h2>
+`;
+
+g.packs.forEach(p=>{
+
+out+=`
+<div style="
+background:#1e293b;
+color:white;
+padding:15px;
+margin-bottom:10px;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+">
+
+<div>
+<div style="
+font-size:17px;
+font-weight:bold;
+">
+${p.t}
+</div>
+
+<div style="
+color:#22c55e;
+font-size:18px;
+font-weight:bold;
+margin-top:5px;
+">
+৳${p.p}
+</div>
+</div>
+
+<button
+style="
+background:#22c55e;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+"
+onclick="selectPack('${name}','${p.t}',${p.p})">
+Buy
+</button>
+
+</div>
+`;
 });
+
+out += `
+<button
+onclick="closePopup()"
+style="
+width:100%;
+padding:12px;
+background:red;
+border:none;
+border-radius:10px;
+color:white;
+margin-top:10px;
+">
+Close
+</button>
+`;
+
+popup.innerHTML=out;
+popup.style.display="block";
+};
+  
+/* PACK */
+window.selectPack=(g,p,pr)=>{
+currentGame=g;
+selectedPack=p;
+selectedPrice=pr;
+
+if(g==="eFootball"){
+popup.innerHTML=`
+<h3>${g}</h3>
+
+<input id="konamiEmail" placeholder="Konami Gmail">
+<input id="konamiPass" type="password" placeholder="Konami Password">
+<input id="whatsapp" placeholder="WhatsApp Number">
+
+<select id="payment">
+<option>bKash</option>
+<option>Nagad</option>
+</select>
+
+<p>Send Money: <b>01917441304</b></p>
+
+<input
+id="sender"
+placeholder="Your bKash/Nagad Number">
+
+<input
+id="trxid"
+placeholder="Transaction ID (TRX ID)">
+
+<button onclick="placeOrder()">Place Order</button>
+<button onclick="closePopup()" style="background:red">Close</button>
+`;
+  
+}else{
+popup.innerHTML=`
+<h3>${g}</h3>
+
+<input id="uid" placeholder="UID">
+<input id="whatsapp" placeholder="WhatsApp Number">
+
+<select id="payment">
+<option>bKash</option>
+<option>Nagad</option>
+</select>
+
+<p>Send Money: <b>01917441304</b></p>
+
+<input
+id="sender"
+placeholder="Your bKash/Nagad Number">
+
+<input
+id="trxid"
+placeholder="Transaction ID (TRX ID)">
+
+<button onclick="placeOrder()">Place Order</button>
+
+<button onclick="closePopup()" style="background:red">
+Close
+</button>
+`;
+}
+};   
+
+/* ORDER */
+window.placeOrder=async()=>{
+
+if(!user){
+alert("Login required");
+return;
 }
 
-document.getElementById("members").innerHTML = html;
+let orderData={
+user:user.email,
+game:currentGame,
+pack:selectedPack,
+price:selectedPrice,
+payment:document.getElementById("payment").value,
+sender: document.getElementById("sender").value,
+trxid: document.getElementById("trxid").value,
+whatsapp:document.getElementById("whatsapp").value,
+status:"pending",
+time:new Date().toLocaleString()
+};
+
+if(currentGame==="eFootball"){
+orderData.konamiEmail=
+document.getElementById("konamiEmail").value;
+
+orderData.konamiPass=
+document.getElementById("konamiPass").value;
+}else{
+orderData.uid=
+document.getElementById("uid").value;
 }
 
-loadMembers();
-</script>
+await addDoc(collection(db,"orders"),orderData);
 
-</body>
-</html>
+alert("Order Placed");
+closePopup();
+};
+  
+/* ORDERS */
+window.loadOrders=()=>{
+
+onSnapshot(collection(db,"orders"),(snap)=>{
+
+let out="";
+
+snap.forEach(d=>{
+
+let x=d.data();
+
+if(x.user===user?.email){
+
+let statusColor="#facc15";
+let statusText="⏳ Pending";
+
+if(x.status==="completed"){
+statusColor="#22c55e";
+statusText="✅ Completed";
+}
+
+if(x.status==="cancelled"){
+statusColor="#ef4444";
+statusText="❌ Cancelled";
+}
+
+out += `
+<div style="
+background:#1e293b;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+border-left:5px solid ${statusColor};
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+">
+
+<h3 style="
+margin:0;
+color:white;
+">
+🎮 ${x.game}
+</h3>
+
+<p style="
+margin:8px 0;
+color:#cbd5e1;
+">
+📦 ${x.pack}
+</p>
+
+<p style="
+margin:8px 0;
+font-weight:bold;
+color:#22c55e;
+font-size:18px;
+">
+💰 ৳${x.price}
+</p>
+
+<div style="margin:10px 0;">
+<span style="
+background:${statusColor};
+padding:6px 12px;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+color:black;
+">
+${statusText}
+</span>
+</div>
+
+<p style="
+font-size:12px;
+color:#94a3b8;
+margin-top:10px;
+">
+🕒 ${x.time}
+</p>
+
+</div>
+`;
+
+}
+
+});
+
+if(out===""){
+out=`
+<div style="
+text-align:center;
+padding:40px;
+color:#94a3b8;
+">
+📦 No Orders Found
+</div>
+`;
+}
+
+orders.innerHTML=out;
+
+});
+
+};
+  
+/* PROFILE */
+window.loadProfile = () => {
+
+if(!user){
+profile.innerHTML=`
+<div style="padding:20px;text-align:center">
+
+<h2>Account</h2>
+
+<button
+onclick="login()"
+style="
+width:100%;
+padding:12px;
+margin-bottom:10px;
+background:#22c55e;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+">
+Login
+</button>
+
+<button
+onclick="signup()"
+style="
+width:100%;
+padding:12px;
+background:#2563eb;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+">
+Sign Up
+</button>
+
+</div>
+`;
+return;
+}
+
+profile.innerHTML=`
+<div style="
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin:10px;
+">
+
+<div style="text-align:center">
+
+<div style="
+width:80px;
+height:80px;
+border-radius:50%;
+background:#22c55e;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:35px;
+margin:auto;
+">
+👤
+</div>
+
+<h2>${user.email.split("@")[0]}</h2>
+
+<p style="color:#94a3b8;">
+${user.email}
+</p>
+
+</div>
+
+<div style="
+background:#0f172a;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+">
+
+<p>
+💰 Total Spent:
+<b style="color:#22c55e">
+৳<span id="spent">0</span>
+</b>
+</p>
+
+<p>
+📦 Total Orders:
+<b id="totalOrders">0</b>
+</p>
+
+</div>
+
+<button
+onclick="logout()"
+style="
+width:100%;
+padding:12px;
+background:#ef4444;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+margin-top:15px;
+">
+🚪 Logout
+</button>
+
+</div>
+`;
+
+onSnapshot(collection(db,"orders"),(snap)=>{
+
+let total = 0;
+let totalOrders = 0;
+
+snap.forEach(d=>{
+
+let x = d.data();
+
+if(user && x.user === user.email){
+
+totalOrders++;
+
+if(x.status === "completed"){
+total += Number(x.price || 0);
+}
+
+}
+
+});
+
+document.getElementById("spent").innerText = total;
+
+if(document.getElementById("totalOrders")){
+document.getElementById("totalOrders").innerText = totalOrders;
+}
+
+});
+
+}; 
+  
+/* ADMIN */  
+window.adminLogin = () => {
+  const pass = prompt("Admin Password");
+  if (pass !== "1234") return;
+
+  const admin = document.getElementById("admin");
+  const adminOrders = document.getElementById("adminOrders");
+
+  admin.style.display = "block";
+
+  onSnapshot(collection(db, "orders"), (snap) => {
+    let out = "";
+
+    snap.forEach((d) => {
+      const x = d.data() || {};
+
+      out += `
+        <p>
+          ${x.game || ""}<br>
+          ${x.user || ""}<br>
+          ${x.status || ""}
+        </p>
+      `;
+    });
+
+    adminOrders.innerHTML = out;
+  });
+};
+
+/* logout OUTSIDE */
+window.logout = async () => {
+  try {
+    await signOut(auth);
+    alert("Logged Out");
+    showHome();
+  } catch (err) {
+    alert(err.message);
+    console.log(err);
+  }
+};
+  
+/* NAV */  
+window.showHome=()=>{home.style.display="block";orders.style.display="none";profile.style.display="none";}  
+window.showOrders=()=>{home.style.display="none";orders.style.display="block";profile.style.display="none";}  
+window.showProfile=()=>{
+home.style.display="none";
+orders.style.display="none";
+profile.style.display="block";
+loadProfile();
+}
+  
+window.closePopup=()=>popup.style.display="none";  
+window.closeAdmin=()=>admin.style.display="none";  
+  
+</script>  
+  
+</body>  
+</html>  
