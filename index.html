@@ -178,7 +178,15 @@ border:none;
   
 <script type="module">  
   
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";  
+import {
+getFirestore,
+collection,
+addDoc,
+updateDoc,
+doc,
+onSnapshot,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";  
 import {  
 getFirestore, collection, addDoc, updateDoc, doc, onSnapshot  
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";  
@@ -802,22 +810,99 @@ window.adminLogin = () => {
       const x = d.data() || {};
 
       out += `
-<div style="background:#1e293b;padding:10px;margin:10px;border-radius:10px">
-<b>${x.game}</b><br>
-👤 ${x.user}<br>
-📦 ${x.pack}<br>
-💰 ৳${x.price}<br>
-📱 ${x.whatsapp}<br>
-📌 ${x.status}
+<div
+onclick="viewOrder('${d.id}')"
+style="
+background:#1e293b;
+padding:15px;
+margin:10px;
+border-radius:10px;
+cursor:pointer;
+">
+
+<h3>${x.game}</h3>
+
+<p>👤 ${x.user || "N/A"}</p>
+
+<p style="color:#22c55e">
+${x.status}
+</p>
+
 </div>
 `;
     });
+    
+window.viewOrder = async(id)=>{
 
+const d = await getDoc(doc(db,"orders",id));
+
+const x = d.data();
+
+popup.innerHTML=`
+
+<h2>${x.game}</h2>
+
+<p>👤 ${x.user}</p>
+
+<p>📦 ${x.pack}</p>
+
+<p>💰 ৳${x.price}</p>
+
+<p>📱 ${x.whatsapp}</p>
+
+<p>💳 ${x.payment}</p>
+
+<p>🧾 ${x.trxid}</p>
+
+<p>📌 ${x.status}</p>
+
+<button onclick="completeOrder('${id}')">
+✅ Done
+</button>
+
+<button onclick="cancelOrder('${id}')">
+❌ Cancel
+</button>
+
+<button onclick="closePopup()">
+Close
+</button>
+
+`;
+
+popup.style.display="block";
+
+};
     adminOrders.innerHTML = out;
   });
 };
 
 /* logout OUTSIDE */
+window.completeOrder = async(id)=>{
+
+await updateDoc(
+doc(db,"orders",id),
+{
+status:"completed"
+});
+
+alert("Completed");
+closePopup();
+
+};
+
+window.cancelOrder = async(id)=>{
+
+await updateDoc(
+doc(db,"orders",id),
+{
+status:"cancelled"
+});
+
+alert("Cancelled");
+closePopup();
+
+};  
 window.logout = async () => {
   try {
     await signOut(auth);
