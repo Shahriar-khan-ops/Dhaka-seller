@@ -481,7 +481,30 @@ if(!user){
 alert("Login required");
 return;
 }
+  
+if(
+ !document.getElementById("whatsapp").value ||
+ !document.getElementById("sender").value ||
+ !document.getElementById("trxid").value
+){
+ alert("সব তথ্য পূরণ করুন");
+ return;
+}
 
+if(currentGame !== "eFootball"){
+ if(!document.getElementById("uid").value){
+   alert("UID দিন");
+   return;
+ }
+}else{
+ if(
+   !document.getElementById("konamiEmail").value ||
+   !document.getElementById("konamiPass").value
+ ){
+   alert("Konami Email ও Password দিন");
+   return;
+ }
+}
 let orderData={
 user:user.email,
 game:currentGame,
@@ -779,12 +802,15 @@ window.adminLogin = () => {
       const x = d.data() || {};
 
       out += `
-        <p>
-          ${x.game || ""}<br>
-          ${x.user || ""}<br>
-          ${x.status || ""}
-        </p>
-      `;
+<div style="background:#1e293b;padding:10px;margin:10px;border-radius:10px">
+<b>${x.game}</b><br>
+👤 ${x.user}<br>
+📦 ${x.pack}<br>
+💰 ৳${x.price}<br>
+📱 ${x.whatsapp}<br>
+📌 ${x.status}
+</div>
+`;
     });
 
     adminOrders.innerHTML = out;
