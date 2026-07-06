@@ -822,9 +822,7 @@ window.adminLogin = () => {
 
       <h3>${x.game || "N/A"}</h3>
 
-      <p>
-      👤 ${x.user || "N/A"}
-      </p>
+      <p>👤 ${x.user || "N/A"}</p>
 
       <p style="color:#22c55e">
       ${x.status || "pending"}
@@ -846,7 +844,6 @@ window.adminLogin = () => {
 window.viewOrder = async(id)=>{
 
   const d = await getDoc(doc(db,"orders",id));
-
   const x = d.data();
 
   popup.innerHTML = `
@@ -868,22 +865,23 @@ window.viewOrder = async(id)=>{
   <p>📌 ${x.status || "pending"}</p>
 
   <button onclick="completeOrder('${id}')">
-  ✅ Done
+    ✅ Done
   </button>
 
   <button onclick="cancelOrder('${id}')">
-  ❌ Cancel
+    ❌ Cancel
   </button>
 
   <button onclick="closePopup()">
-  Close
+    Close
   </button>
 
   `;
 
   popup.style.display = "block";
 };
-  
+
+
 /* COMPLETE ORDER */
 window.completeOrder = async(id)=>{
 
@@ -913,10 +911,6 @@ window.cancelOrder = async(id)=>{
   closePopup();
 };
   
-    adminOrders.innerHTML = out;
-  });
-};
-
 /* logout OUTSIDE */
 window.completeOrder = async(id)=>{
 
