@@ -793,86 +793,126 @@ document.getElementById("totalOrders").innerText = totalOrders;
 
 }; 
   
-/* ADMIN */  
+/* ADMIN */
 window.adminLogin = () => {
-  const pass = prompt("Admin Password");
-  if (pass !== "1234") return;
 
-  const admin = document.getElementById("admin");
-  const adminOrders = document.getElementById("adminOrders");
+  const pass = prompt("Admin Password");
+  if(pass !== "1234") return;
 
   admin.style.display = "block";
 
-  onSnapshot(collection(db, "orders"), (snap) => {
+  onSnapshot(collection(db,"orders"),(snap)=>{
+
     let out = "";
 
-    snap.forEach((d) => {
-      const x = d.data() || {};
+    snap.forEach((d)=>{
+
+      let x = d.data();
 
       out += `
-<div
-onclick="viewOrder('${d.id}')"
-style="
-background:#1e293b;
-padding:15px;
-margin:10px;
-border-radius:10px;
-cursor:pointer;
-">
+      <div
+      onclick="viewOrder('${d.id}')"
+      style="
+      background:#1e293b;
+      padding:15px;
+      margin:10px;
+      border-radius:10px;
+      cursor:pointer;
+      ">
 
-<h3>${x.game}</h3>
+      <h3>${x.game || "N/A"}</h3>
 
-<p>👤 ${x.user || "N/A"}</p>
+      <p>
+      👤 ${x.user || "N/A"}
+      </p>
 
-<p style="color:#22c55e">
-${x.status}
-</p>
+      <p style="color:#22c55e">
+      ${x.status || "pending"}
+      </p>
 
-</div>
-`;
+      </div>
+      `;
+
     });
-    
-window.viewOrder = async(id)=>{
 
-const d = await getDoc(doc(db,"orders",id));
+    adminOrders.innerHTML = out;
 
-const x = d.data();
-
-popup.innerHTML=`
-
-<h2>${x.game}</h2>
-
-<p>👤 ${x.user}</p>
-
-<p>📦 ${x.pack}</p>
-
-<p>💰 ৳${x.price}</p>
-
-<p>📱 ${x.whatsapp}</p>
-
-<p>💳 ${x.payment}</p>
-
-<p>🧾 ${x.trxid}</p>
-
-<p>📌 ${x.status}</p>
-
-<button onclick="completeOrder('${id}')">
-✅ Done
-</button>
-
-<button onclick="cancelOrder('${id}')">
-❌ Cancel
-</button>
-
-<button onclick="closePopup()">
-Close
-</button>
-
-`;
-
-popup.style.display="block";
+  });
 
 };
+
+
+/* VIEW ORDER */
+window.viewOrder = async(id)=>{
+
+  const d = await getDoc(doc(db,"orders",id));
+
+  const x = d.data();
+
+  popup.innerHTML = `
+
+  <h2>${x.game}</h2>
+
+  <p>👤 ${x.user || "N/A"}</p>
+
+  <p>📦 ${x.pack || "N/A"}</p>
+
+  <p>💰 ৳${x.price || 0}</p>
+
+  <p>📱 ${x.whatsapp || "N/A"}</p>
+
+  <p>💳 ${x.payment || "N/A"}</p>
+
+  <p>🧾 ${x.trxid || "N/A"}</p>
+
+  <p>📌 ${x.status || "pending"}</p>
+
+  <button onclick="completeOrder('${id}')">
+  ✅ Done
+  </button>
+
+  <button onclick="cancelOrder('${id}')">
+  ❌ Cancel
+  </button>
+
+  <button onclick="closePopup()">
+  Close
+  </button>
+
+  `;
+
+  popup.style.display = "block";
+};
+  
+/* COMPLETE ORDER */
+window.completeOrder = async(id)=>{
+
+  await updateDoc(
+    doc(db,"orders",id),
+    {
+      status:"completed"
+    }
+  );
+
+  alert("Order Completed");
+  closePopup();
+};
+
+
+/* CANCEL ORDER */
+window.cancelOrder = async(id)=>{
+
+  await updateDoc(
+    doc(db,"orders",id),
+    {
+      status:"cancelled"
+    }
+  );
+
+  alert("Order Cancelled");
+  closePopup();
+};
+  
     adminOrders.innerHTML = out;
   });
 };
